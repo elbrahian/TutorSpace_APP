@@ -102,7 +102,7 @@ export default function BuscarTutores() {
                             No se encontraron tutores disponibles para tu búsqueda.
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {tutores.map(t => (
                                 <Card key={t.id} className="overflow-hidden hover:shadow-lg transition-shadow border-slate-200 dark:border-slate-800">
                                     <div className="p-6">

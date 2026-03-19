@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { MessageSquare, CalendarPlus } from 'lucide-react'
+import { MessageSquare, CalendarPlus, ChevronLeft } from 'lucide-react'
 import { Navbar } from '../../components/layout/Navbar'
 import { ChatSidebar } from '../../components/chat/ChatSidebar'
 import { ChatMessages } from '../../components/chat/ChatMessages'
@@ -19,43 +19,75 @@ export default function ChatPage() {
     } = useChat()
 
     const [dialogOpen, setDialogOpen] = useState(false)
+    const [mobileView, setMobileView] = useState<'lista' | 'chat'>('lista')
 
     useEffect(() => {
         cargarChats()
     }, [])
 
+    // Sincronizar vista móvil cuando cambia el chat activo
+    useEffect(() => {
+        if (chatActivo) {
+            setMobileView('chat')
+        } else {
+            setMobileView('lista')
+        }
+    }, [chatActivo])
+
     return (
         <div className="flex flex-col h-screen overflow-hidden">
             <Navbar />
             
-            <div className="flex flex-1 overflow-hidden h-[calc(100vh-64px)]">
+            <div className="flex flex-1 overflow-hidden h-[calc(100vh-64px)] relative">
                 {/* Izquierda: Sidebar de chats */}
-                <ChatSidebar 
-                    chats={chats} 
-                    chatActivo={chatActivo}
-                    onSeleccionar={setChatActivo}
-                    getNombreChat={getNombreChat}
-                />
+                <div className={`
+                    ${mobileView === 'lista' ? 'flex' : 'hidden'} 
+                    lg:flex w-full lg:w-80 flex-col shrink-0 border-r border-slate-200 dark:border-slate-800
+                `}>
+                    <ChatSidebar 
+                        chats={chats} 
+                        chatActivo={chatActivo}
+                        onSeleccionar={(chat) => {
+                            setChatActivo(chat)
+                            setMobileView('chat')
+                        }}
+                        getNombreChat={getNombreChat}
+                    />
+                </div>
                 
                 {/* Derecha: Área de mensajes */}
-                <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 relative z-10 shadow-[-4px_0_15px_-3px_rgba(0,0,0,0.05)]">
+                <div className={`
+                    ${mobileView === 'chat' ? 'flex' : 'hidden'} 
+                    lg:flex flex-1 flex-col min-w-0 bg-white dark:bg-slate-900 relative z-10
+                `}>
                     {chatActivo ? (
                         <>
                             {/* Cabecera del chat activo */}
-                            <div className="h-20 border-b flex items-center px-6 bg-white dark:bg-slate-950 shrink-0 z-10 shadow-sm relative">
-                                <div className="flex items-center gap-4">
+                            <div className="h-16 md:h-20 border-b flex items-center px-4 md:px-6 bg-white dark:bg-slate-950 shrink-0 z-10 shadow-sm relative">
+                                <div className="flex items-center gap-3 md:gap-4 w-full">
+                                    {/* Botón Volver (Solo Móvil) */}
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="lg:hidden -ml-2 h-8 w-8"
+                                        onClick={() => setMobileView('lista')}
+                                    >
+                                        <ChevronLeft className="w-6 h-6" />
+                                    </Button>
+
                                     <Avatar 
                                         nombre={getNombreChat(chatActivo)} 
                                         rol={usuario?.rol === 'TUTOR' ? 'ESTUDIANTE' as Rol : 'TUTOR' as Rol}
                                         size="md"
+                                        className="w-10 h-10 md:w-12 md:h-12"
                                     />
-                                    <div>
-                                        <h3 className="font-extrabold text-slate-900 dark:text-slate-100 text-lg leading-tight tracking-tight">
+                                    <div className="min-w-0 flex-1">
+                                        <h3 className="font-extrabold text-slate-900 dark:text-slate-100 text-base md:text-lg leading-tight tracking-tight truncate">
                                             {getNombreChat(chatActivo)}
                                         </h3>
-                                        <div className="flex items-center gap-1.5 mt-1">
-                                            <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)] animate-pulse" />
-                                            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-widest">En línea</span>
+                                        <div className="flex items-center gap-1.5 mt-0.5 md:mt-1">
+                                            <div className="w-2 h-2 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.5)] animate-pulse" />
+                                            <span className="text-[10px] md:text-[11px] font-bold text-slate-500 uppercase tracking-widest">En línea</span>
                                         </div>
                                     </div>
                                     
@@ -63,10 +95,11 @@ export default function ChatPage() {
                                         <Button
                                             size="sm"
                                             variant="outline"
-                                            className="ml-auto bg-primary/5 text-primary hover:bg-primary/10 border-primary/20"
+                                            className="ml-auto bg-primary/5 text-primary hover:bg-primary/10 border-primary/20 h-9 px-3"
                                             onClick={() => setDialogOpen(true)}
                                         >
-                                            <CalendarPlus className="w-4 h-4 mr-2" /> Agendar Sesión
+                                            <CalendarPlus className="w-4 h-4 md:mr-2" /> 
+                                            <span className="hidden md:inline">Agendar Sesión</span>
                                         </Button>
                                     )}
                                 </div>

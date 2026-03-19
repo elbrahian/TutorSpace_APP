@@ -6,11 +6,11 @@ import { Link } from 'react-router-dom'
 import { BookOpen } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
+import { CardTitle } from '../../components/ui/card'
 
 const loginSchema = z.object({
     email: z.string().email('Email inválido'),
-    password: z.string().min(1, 'La contraseña es requerida'),
+    password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
 })
 
 type LoginForm = z.infer<typeof loginSchema>
@@ -30,9 +30,9 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-4">
-            <Card className="w-full max-w-md shadow-xl border-slate-200 dark:border-slate-800">
-                <CardHeader className="space-y-4 text-center pb-8 border-b border-slate-100 dark:border-slate-800/60 mb-6">
+        <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 p-4 md:p-6">
+            <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 overflow-hidden transform transition-all">
+                <div className="p-6 md:p-8 lg:p-10 space-y-4 text-center pb-8 border-b border-slate-100 dark:border-slate-800/60 mb-6">
                     <div className="flex justify-center mb-2">
                         <div className="p-3 bg-primary/10 rounded-full">
                             <BookOpen className="w-10 h-10 text-primary" />
@@ -41,9 +41,10 @@ export default function LoginPage() {
                     <CardTitle className="text-3xl font-bold bg-gradient-to-br from-slate-900 to-slate-600 dark:from-white dark:to-slate-400 bg-clip-text text-transparent">
                         TutorSpace
                     </CardTitle>
-                    <p className="text-slate-500 dark:text-slate-400">Inicia sesión en tu cuenta</p>
-                </CardHeader>
-                <CardContent>
+                    <p className="text-slate-500 dark:text-slate-400 font-medium">Acceso a la plataforma de tutorías</p>
+                </div>
+
+                <div className="p-6 md:p-8 lg:p-10 pt-0">
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                         {error && (
                             <div className="p-3 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-md text-sm font-medium border border-red-200 dark:border-red-800/50">
@@ -88,8 +89,8 @@ export default function LoginPage() {
                             </Link>
                         </div>
                     </form>
-                </CardContent>
-            </Card>
+                </div>
+            </div>
         </div>
     )
 }

@@ -11,7 +11,7 @@ export const useAuth = () => {
     const logoutStore = useAuthStore((state) => state.logout)
     const navigate = useNavigate()
 
-    const login = async (data: any) => {
+    const login = async (data: { email: string; password: string }) => {
         try {
             setLoading(true)
             setError(null)
@@ -22,23 +22,23 @@ export const useAuth = () => {
             else if (res.rol === 'TUTOR') navigate('/tutor')
             else navigate('/estudiante')
 
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Error al iniciar sesión')
+        } catch (err: unknown) {
+            setError('Correo o contraseña incorrectos')
             throw err
         } finally {
             setLoading(false)
         }
     }
 
-    const register = async (data: any) => {
+    const register = async (data: { nombre: string; email: string; password: string }) => {
         try {
             setLoading(true)
             setError(null)
             const res = await authApi.register(data)
             loginStore(res)
             navigate('/estudiante')
-        } catch (err: any) {
-            setError(err.response?.data?.message || 'Error al registrarse')
+        } catch (err: unknown) {
+            setError('No se pudo completar el registro. Verifica tus datos e intenta de nuevo.')
             throw err
         } finally {
             setLoading(false)

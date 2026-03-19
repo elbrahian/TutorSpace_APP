@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import type { AuthResponse, Rol } from '../types'
 
 interface AuthState {
@@ -23,10 +23,15 @@ export const useAuthStore = create<AuthState>()(
                         rol: data.rol,
                     },
                 }),
-            logout: () => set({ token: null, usuario: null }),
+            logout: () => {
+                set({ token: null, usuario: null })
+                // Fully clear persisted storage so no stale data remains
+                localStorage.removeItem('tutorspace-auth')
+            },
         }),
         {
             name: 'tutorspace-auth',
+            storage: createJSONStorage(() => localStorage),
         }
     )
 )

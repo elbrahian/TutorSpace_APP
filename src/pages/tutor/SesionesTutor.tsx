@@ -63,16 +63,15 @@ export default function SesionesTutor() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                <div className="flex justify-between items-end">
+                <div className="flex flex-col md:flex-row md:justify-between md:items-end gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Calendario de Sesiones</h1>
-                        <p className="text-slate-500 mt-2">Visualiza, aprueba o cancela las solicitudes de los estudiantes.</p>
+                        <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Calendario de Sesiones</h1>
+                        <p className="text-slate-500 mt-1 text-sm md:text-base">Visualiza, aprueba o cancela las solicitudes de los estudiantes.</p>
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm relative">
-
-                    <div className="flex gap-4 mb-6">
+                <div className="bg-white dark:bg-slate-900 text-slate-900 dark:text-white p-4 md:p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm relative overflow-hidden">
+                    <div className="flex flex-wrap gap-x-4 gap-y-2 mb-6">
                         <div className="flex items-center gap-2">
                             <div className="w-3 h-3 rounded-full bg-[#10B981] shadow-sm"></div>
                             <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Aprobada</span>
@@ -87,19 +86,22 @@ export default function SesionesTutor() {
                         </div>
                     </div>
 
-                    <FullCalendar
-                        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                        initialView="dayGridMonth"
-                        headerToolbar={{
-                            left: 'prev,next today',
-                            center: 'title',
-                            right: 'dayGridMonth,timeGridWeek'
-                        }}
-                        events={eventos}
-                        eventClick={handleEventClick}
-                        height="650px"
-                        locale="es"
-                    />
+                    <div className="calendar-container overflow-x-auto">
+                        <FullCalendar
+                            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                            initialView={window.innerWidth < 768 ? 'dayGridMonth' : 'dayGridMonth'}
+                            headerToolbar={{
+                                left: 'prev,next today',
+                                center: 'title',
+                                right: window.innerWidth < 768 ? '' : 'dayGridMonth,timeGridWeek'
+                            }}
+                            events={eventos}
+                            eventClick={handleEventClick}
+                            height="auto"
+                            contentHeight="600px"
+                            locale="es"
+                        />
+                    </div>
 
                     {/* Modal Overlay / Backdrop for Selected Event */}
                     {selectedSesion && (

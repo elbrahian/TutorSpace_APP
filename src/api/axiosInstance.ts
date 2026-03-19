@@ -13,18 +13,26 @@ axiosInstance.interceptors.request.use(
         }
         return config
     },
-    (error) => {
-        return Promise.reject(error)
-    }
+    (error) => Promise.reject(error)
 )
 
 axiosInstance.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
+        const status = error.response?.status
+        const url = error.config?.url ?? ''
+
+        if (status === 401 && !url.includes('/auth/')) {
+            // Token expired or invalid — log out and redirect
             useAuthStore.getState().logout()
             window.location.href = '/login'
         }
+
+        if (status === 403) {
+            // Valid token but insufficient permissions — do NOT log out
+            window.location.href = '/unauthorized'
+        }
+
         return Promise.reject(error)
     }
 )

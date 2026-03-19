@@ -2,7 +2,12 @@ import { Link, useLocation } from 'react-router-dom'
 import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 
-export const Sidebar = () => {
+interface SidebarProps {
+    isOpen?: boolean
+    onClose?: () => void
+}
+
+export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     const usuario = useAuthStore((state) => state.usuario)
     const location = useLocation()
 
@@ -39,7 +44,21 @@ export const Sidebar = () => {
     const links = getLinks()
 
     return (
-        <aside className="w-64 border-r bg-slate-50/50 dark:bg-slate-900/50 h-[calc(100vh-4rem)] sticky top-16 hidden md:block">
+        <aside className={`
+            fixed lg:static inset-y-0 left-0 z-50
+            w-64 border-r bg-white dark:bg-slate-900 
+            h-screen lg:h-[calc(100vh-4rem)] lg:top-16
+            transform transition-transform duration-300 ease-in-out
+            ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'}
+        `}>
+            <div className="p-4 border-b flex items-center justify-between lg:hidden bg-slate-50 dark:bg-slate-950">
+                <div className="flex items-center gap-2 text-primary font-bold text-xl">
+                    <BookOpen className="w-6 h-6" />
+                    <span>TutorSpace</span>
+                </div>
+                {/* Botón opcional para cerrar dentro del aside si se prefiere */}
+            </div>
+
             <nav className="p-4 space-y-2">
                 {links.map((link) => {
                     const isActive = location.pathname === link.path
@@ -47,7 +66,9 @@ export const Sidebar = () => {
                         <Link
                             key={link.path}
                             to={link.path}
+                            onClick={onClose}
                             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${isActive
+
                                     ? 'bg-primary text-primary-foreground font-medium'
                                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                                 }`}

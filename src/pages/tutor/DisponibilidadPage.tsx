@@ -127,53 +127,91 @@ export default function DisponibilidadPage() {
                         </CardHeader>
                         <CardContent className="p-0">
                             {franjas.length === 0 ? (
-                                <div className="p-10 text-center text-slate-500">
+                                <div className="p-10 text-center text-slate-500 font-medium">
                                     No has registrado disponibilidad. Serás invisible para los estudiantes.
                                 </div>
                             ) : (
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-sm text-left">
-                                        <thead className="text-xs text-slate-500 uppercase bg-slate-50/50 dark:bg-slate-900/50 border-b">
-                                            <tr>
-                                                <th className="px-6 py-4 font-semibold">Día</th>
-                                                <th className="px-6 py-4 font-semibold">Horario</th>
-                                                <th className="px-6 py-4 font-semibold">Estado</th>
-                                                <th className="px-6 py-4 font-semibold text-right">Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {franjas.map((f) => (
-                                                <tr key={f.id} className="border-b dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50">
-                                                    <td className="px-6 py-4 font-medium">{f.dia}</td>
-                                                    <td className="px-6 py-4">
-                                                        {f.horaInicio.slice(0, 5)} - {f.horaFin.slice(0, 5)}
-                                                    </td>
-                                                    <td className="px-6 py-4">
-                                                        <span className={`px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide rounded border ${f.estado === 'DISPONIBLE'
-                                                            ? 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
-                                                            : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                                <>
+                                    {/* Vista Móvil: Cards */}
+                                    <div className="md:hidden space-y-3 p-4">
+                                        {franjas.map((f) => (
+                                            <div key={f.id} className="bg-white dark:bg-slate-900 rounded-xl p-4 border border-slate-200 dark:border-slate-800 shadow-sm flex justify-between items-center transition-all hover:border-primary/30">
+                                                <div className="space-y-1.5">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-slate-900 dark:text-slate-100">{f.dia}</span>
+                                                        <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-widest rounded border ${f.estado === 'DISPONIBLE'
+                                                            ? 'bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
+                                                            : 'bg-slate-50 text-slate-500 border-slate-100 dark:bg-slate-800 dark:text-slate-500 dark:border-slate-700'
                                                             }`}>
                                                             {f.estado}
                                                         </span>
-                                                    </td>
-                                                    <td className="px-6 py-4 text-right">
-                                                        {f.estado === 'DISPONIBLE' && (
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="icon"
-                                                                onClick={() => eliminar(f.id)}
-                                                                className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                                                title="Eliminar franja"
-                                                            >
-                                                                <Trash2 className="w-4 h-4" />
-                                                            </Button>
-                                                        )}
-                                                    </td>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 font-medium">
+                                                        <Clock className="w-3.5 h-3.5" />
+                                                        {f.horaInicio.slice(0, 5)} - {f.horaFin.slice(0, 5)}
+                                                    </div>
+                                                </div>
+                                                
+                                                {f.estado === 'DISPONIBLE' && (
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        onClick={() => eliminar(f.id)}
+                                                        className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 h-10 w-10 shrink-0"
+                                                        title="Eliminar franja"
+                                                    >
+                                                        <Trash2 className="w-5 h-5" />
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Vista Desktop: Tabla */}
+                                    <div className="hidden md:block overflow-x-auto">
+                                        <table className="w-full text-sm text-left">
+                                            <thead className="text-xs text-slate-500 uppercase bg-slate-50/50 dark:bg-slate-900/50 border-b">
+                                                <tr>
+                                                    <th className="px-6 py-4 font-semibold">Día</th>
+                                                    <th className="px-6 py-4 font-semibold">Horario</th>
+                                                    <th className="px-6 py-4 font-semibold">Estado</th>
+                                                    <th className="px-6 py-4 font-semibold text-right">Acciones</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </div>
+                                            </thead>
+                                            <tbody>
+                                                {franjas.map((f) => (
+                                                    <tr key={f.id} className="border-b dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900/50">
+                                                        <td className="px-6 py-4 font-medium">{f.dia}</td>
+                                                        <td className="px-6 py-4">
+                                                            {f.horaInicio.slice(0, 5)} - {f.horaFin.slice(0, 5)}
+                                                        </td>
+                                                        <td className="px-6 py-4">
+                                                            <span className={`px-2.5 py-1 text-xs font-extrabold uppercase tracking-wide rounded border ${f.estado === 'DISPONIBLE'
+                                                                ? 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
+                                                                : 'bg-slate-100 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                                                                }`}>
+                                                                {f.estado}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-6 py-4 text-right">
+                                                            {f.estado === 'DISPONIBLE' && (
+                                                                <Button
+                                                                    variant="ghost"
+                                                                    size="icon"
+                                                                    onClick={() => eliminar(f.id)}
+                                                                    className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                                                    title="Eliminar franja"
+                                                                >
+                                                                    <Trash2 className="w-4 h-4" />
+                                                                </Button>
+                                                            )}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </>
                             )}
                         </CardContent>
                     </Card>

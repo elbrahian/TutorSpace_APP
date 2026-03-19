@@ -147,8 +147,74 @@ export default function GestionTutores() {
                     </Button>
                 </div>
 
-                {/* Tabla principal */}
-                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                {/* Vista Móvil: Cards */}
+                <div className="md:hidden space-y-4">
+                    {tutores.map(t => (
+                        <div key={t.id} className="bg-white dark:bg-slate-900 rounded-xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                                <div className="flex items-center gap-3">
+                                    <Avatar nombre={t.nombre} rol="TUTOR" size="md" />
+                                    <div>
+                                        <div className="font-bold text-slate-900 dark:text-slate-100">{t.nombre}</div>
+                                        <div className="text-slate-500 text-xs">{t.email}</div>
+                                    </div>
+                                </div>
+                                <span
+                                    className={`inline-flex items-center gap-1.5 px-3 py-1 text-[10px] font-extrabold uppercase rounded-full ${t.estado === 'ACTIVO'
+                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400'
+                                        : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400'
+                                        }`}
+                                >
+                                    {t.estado}
+                                </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+                                <div className="space-y-1">
+                                    <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Jornada</p>
+                                    <p className="text-slate-700 dark:text-slate-300 font-medium">{t.jornadaGeneral}</p>
+                                </div>
+                                <div className="space-y-1">
+                                    <p className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Materias</p>
+                                    <div className="flex flex-wrap gap-1">
+                                        {t.materias.map(m => (
+                                            <span key={m.id} className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded font-bold">
+                                                {m.codigo}
+                                            </span>
+                                        ))}
+                                        {t.materias.length === 0 && <span className="text-xs text-slate-400 italic">Sin materias</span>}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-2 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                <Button variant="outline" size="sm" className="w-full justify-center text-xs h-10" onClick={() => { setTutorToEditJornada(t); setJornadaInput(t.jornadaGeneral || 'MAÑANA'); setJornadaError(''); }}>
+                                    <Clock className="w-4 h-4 mr-2 text-blue-500" /> Editar jornada
+                                </Button>
+                                <div className="grid grid-cols-2 gap-2">
+                                    <Button variant="outline" size="sm" className="w-full justify-center text-xs h-10" onClick={() => setSelectedTutor(t)}>
+                                        <BookOpen className="w-4 h-4 mr-2 text-blue-500" /> Materias
+                                    </Button>
+                                    <Button variant="outline" size="sm" className="w-full justify-center text-xs h-10" onClick={() => { setTutorToToggle(t); setToggleError(''); }}>
+                                        {t.estado === 'ACTIVO' ? (
+                                            <><UserX className="w-4 h-4 mr-2 text-red-500" /> Desactivar</>
+                                        ) : (
+                                            <><UserCheck className="w-4 h-4 mr-2 text-green-500" /> Activar</>
+                                        )}
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                    {tutores.length === 0 && (
+                        <div className="bg-white dark:bg-slate-900 rounded-xl p-8 text-center text-slate-500 border border-dashed border-slate-300 dark:border-slate-700">
+                            No hay tutores registrados.
+                        </div>
+                    )}
+                </div>
+
+                {/* Tabla principal (Solo Desktop) */}
+                <div className="hidden md:block bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
                     <div className="overflow-x-auto">
                         <table className="w-full text-sm text-left">
                             <thead className="bg-slate-50/50 dark:bg-slate-900/50 text-xs uppercase text-slate-500 dark:text-slate-400 border-b">

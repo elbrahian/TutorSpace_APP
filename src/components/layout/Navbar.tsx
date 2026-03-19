@@ -2,10 +2,14 @@ import { Link } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { NotificacionBell } from '../shared/NotificacionBell'
 import { Avatar } from '../shared/Avatar'
-import { BookOpen, LogOut } from 'lucide-react'
+import { BookOpen, LogOut, Menu } from 'lucide-react'
 import { Button } from '../ui/button'
 
-export const Navbar = () => {
+interface NavbarProps {
+    onMenuClick?: () => void
+}
+
+export const Navbar = ({ onMenuClick }: NavbarProps) => {
     const usuario = useAuthStore((state) => state.usuario)
     const logout = useAuthStore((state) => state.logout)
 
@@ -33,23 +37,36 @@ export const Navbar = () => {
     }
 
     return (
-        <nav className="h-16 border-b bg-white dark:bg-slate-950 flex items-center justify-between px-6 sticky top-0 z-40">
-            <Link to={getDashboardPath()} className="flex items-center gap-2 text-primary font-bold text-xl">
-                <BookOpen className="w-6 h-6" />
-                <span>TutorSpace</span>
-            </Link>
+        <nav className="h-16 border-b bg-white dark:bg-slate-950 flex items-center justify-between px-4 md:px-6 sticky top-0 z-50">
+            <div className="flex items-center gap-3">
+                <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="lg:hidden" 
+                    onClick={onMenuClick}
+                    title="Menu"
+                >
+                    <Menu className="w-6 h-6 text-slate-600 dark:text-slate-400" />
+                </Button>
+                
+                <Link to={getDashboardPath()} className="flex items-center gap-2 text-primary font-bold text-xl">
+                    <BookOpen className="w-6 h-6" />
+                    <span className="hidden xs:block">TutorSpace</span>
+                </Link>
+            </div>
 
-            <div className="flex items-center gap-4">
-                <div className="hidden md:flex items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-4">
+                <div className="hidden sm:flex items-center gap-3">
                     <Avatar nombre={usuario.nombre} rol={usuario.rol} size="sm" />
-                    <div className="text-sm">
+                    <div className="hidden md:block text-sm">
                         <span className="text-slate-500 dark:text-slate-400">Hola, </span>
                         <span className="font-bold text-primary">{usuario.nombre}</span>
-                        <span className="ml-2 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-extrabold text-primary uppercase tracking-wider shadow-sm">
-                            {usuario.rol}
-                        </span>
                     </div>
+                    <span className="px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-[10px] font-extrabold text-primary uppercase tracking-wider shadow-sm">
+                        {usuario.rol}
+                    </span>
                 </div>
+
 
                 <NotificacionBell />
 
