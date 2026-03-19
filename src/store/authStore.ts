@@ -20,7 +20,7 @@ export const useAuthStore = create<AuthState>()(
                     usuario: {
                         id: data.id,
                         nombre: data.nombre,
-                        rol: data.rol,
+                        rol: data.rol.trim().toUpperCase() as Rol,
                     },
                 }),
             logout: () => {

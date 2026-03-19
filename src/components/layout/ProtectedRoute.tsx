@@ -14,6 +14,11 @@ export const ProtectedRoute = ({ allowedRoles }: ProtectedRouteProps) => {
         return <Navigate to="/login" replace />
     }
 
+    console.log('--- DEBUG AUTH ---')
+    console.log('Rol del usuario:', usuario?.rol)
+    console.log('Roles permitidos:', allowedRoles)
+    console.log('¿Coincide?:', allowedRoles.includes(usuario.rol))
+
     if (!allowedRoles.includes(usuario.rol)) {
         return <Navigate to="/unauthorized" replace />
     }
