@@ -4,7 +4,7 @@ import { DashboardLayout } from '../../components/layout/DashboardLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
 import { sesionApi } from '../../api/sesionApi'
 import type { SesionResponse, DisponibilidadResponse } from '../../types'
-import { Calendar, Clock, ArrowRight, CheckCircle, XCircle, ShieldCheck } from 'lucide-react'
+import { Calendar, Clock, ArrowRight, CheckCircle, ShieldCheck } from 'lucide-react'
 import { formatDate } from '../../utils/formatDate'
 import { tutorApi } from '../../api/tutorApi'
 
