@@ -29,6 +29,9 @@ axiosInstance.interceptors.response.use(
         }
 
         if (status === 403) {
+            console.error('--- ERROR 403 DETECTADO ---')
+            console.error('URL fallida:', url)
+            console.error('Detalle error:', error.response?.data)
             // Valid token but insufficient permissions — do NOT log out
             window.location.href = '/unauthorized'
         }
