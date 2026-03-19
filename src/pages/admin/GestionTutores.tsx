@@ -7,6 +7,7 @@ import { tutorApi } from '../../api/tutorApi'
 import type { TutorResponse, MateriaResponse } from '../../types'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
+import { Avatar } from '../../components/shared/Avatar'
 import { CheckCircle2, XCircle, Plus, BookOpen, Clock, UserX, UserCheck, Loader2 } from 'lucide-react'
 
 const tutorSchema = z.object({
@@ -163,8 +164,13 @@ export default function GestionTutores() {
                                 {tutores.map(t => (
                                     <tr key={t.id} className="border-b dark:border-slate-800 hover:bg-slate-50/50 dark:hover:bg-slate-900/50">
                                         <td className="px-6 py-4">
-                                            <div className="font-semibold text-slate-900 dark:text-slate-100">{t.nombre}</div>
-                                            <div className="text-slate-500">{t.email}</div>
+                                            <div className="flex items-center gap-3">
+                                                <Avatar nombre={t.nombre} rol="TUTOR" size="sm" />
+                                                <div>
+                                                    <div className="font-semibold text-slate-900 dark:text-slate-100">{t.nombre}</div>
+                                                    <div className="text-slate-500 text-xs">{t.email}</div>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4 text-slate-700 dark:text-slate-300">{t.jornadaGeneral}</td>
                                         <td className="px-6 py-4">

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import { NotificacionBell } from '../shared/NotificacionBell'
+import { Avatar } from '../shared/Avatar'
 import { BookOpen, LogOut } from 'lucide-react'
 import { Button } from '../ui/button'
 
@@ -39,12 +40,15 @@ export const Navbar = () => {
             </Link>
 
             <div className="flex items-center gap-4">
-                <div className="hidden md:block text-sm">
-                    <span className="text-slate-500 dark:text-slate-400">Hola, </span>
-                    <span className="font-bold text-primary">{usuario.nombre}</span>
-                    <span className="ml-2 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-extrabold text-primary uppercase tracking-wider shadow-sm">
-                        {usuario.rol}
-                    </span>
+                <div className="hidden md:flex items-center gap-3">
+                    <Avatar nombre={usuario.nombre} rol={usuario.rol} size="sm" />
+                    <div className="text-sm">
+                        <span className="text-slate-500 dark:text-slate-400">Hola, </span>
+                        <span className="font-bold text-primary">{usuario.nombre}</span>
+                        <span className="ml-2 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-extrabold text-primary uppercase tracking-wider shadow-sm">
+                            {usuario.rol}
+                        </span>
+                    </div>
                 </div>
 
                 <NotificacionBell />

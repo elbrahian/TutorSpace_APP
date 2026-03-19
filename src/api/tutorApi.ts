@@ -45,6 +45,11 @@ export const tutorApi = {
         await axiosInstance.delete(`/admin/tutores/${tutorId}/materias/${materiaId}`)
     },
 
+    getPerfil: async (): Promise<TutorResponse> => {
+        const response = await axiosInstance.get('/tutor/perfil')
+        return response.data
+    },
+
     getDisponibilidad: async (): Promise<DisponibilidadResponse[]> => {
         const response = await axiosInstance.get('/tutor/disponibilidad')
         return response.data

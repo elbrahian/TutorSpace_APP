@@ -22,6 +22,7 @@ export const Sidebar = () => {
                     { name: 'Disponibilidad', path: '/tutor/disponibilidad', icon: <Clock className="w-5 h-5" /> },
                     { name: 'Sesiones', path: '/tutor/sesiones', icon: <Calendar className="w-5 h-5" /> },
                     { name: 'Chat', path: '/tutor/chat', icon: <MessageSquare className="w-5 h-5" /> },
+                    { name: 'Mis Materias', path: '/tutor/materias', icon: <BookOpen className="w-5 h-5" /> },
                 ]
             case 'ESTUDIANTE':
                 return [

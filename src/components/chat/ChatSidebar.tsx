@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, MessageSquare, ArrowLeft } from 'lucide-react'
-import type { ChatResponse } from '../../types'
+import { Avatar } from '../shared/Avatar'
+import { useAuthStore } from '../../store/authStore'
+import type { ChatResponse, Rol } from '../../types'
 
 interface ChatSidebarProps {
     chats: ChatResponse[]
@@ -13,6 +15,9 @@ interface ChatSidebarProps {
 export function ChatSidebar({ chats, chatActivo, onSeleccionar, getNombreChat }: ChatSidebarProps) {
     const [busqueda, setBusqueda] = useState('')
     const navigate = useNavigate()
+    const { usuario } = useAuthStore()
+    // The other person in chat has the opposite role
+    const otherRol: Rol = usuario?.rol === 'TUTOR' ? 'ESTUDIANTE' : 'TUTOR'
 
     const filtrados = chats.filter(c => 
         getNombreChat(c).toLowerCase().includes(busqueda.toLowerCase())
@@ -68,11 +73,7 @@ export function ChatSidebar({ chats, chatActivo, onSeleccionar, getNombreChat }:
                                         <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-r" />
                                     )}
                                     <div className="relative shrink-0">
-                                        <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg select-none shadow-sm ${
-                                            seleccionado ? 'bg-primary text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
-                                        }`}>
-                                            {nombre.charAt(0).toUpperCase()}
-                                        </div>
+                                        <Avatar nombre={nombre} rol={otherRol} size="md" />
                                     </div>
                                     <div className="flex-1 min-w-0 pr-2">
                                         <div className="flex justify-between items-baseline mb-0.5">

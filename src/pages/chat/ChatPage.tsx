@@ -5,9 +5,11 @@ import { ChatSidebar } from '../../components/chat/ChatSidebar'
 import { ChatMessages } from '../../components/chat/ChatMessages'
 import { ChatInput } from '../../components/chat/ChatInput'
 import { AgendarSesionDialog } from '../../components/sesiones/AgendarSesionDialog'
+import { Avatar } from '../../components/shared/Avatar'
 import { Button } from '../../components/ui/button'
 import { useChat } from '../../hooks/useChat'
 import { useAuthStore } from '../../store/authStore'
+import type { Rol } from '../../types'
 
 export default function ChatPage() {
     const { usuario } = useAuthStore()
@@ -42,9 +44,11 @@ export default function ChatPage() {
                             {/* Cabecera del chat activo */}
                             <div className="h-20 border-b flex items-center px-6 bg-white dark:bg-slate-950 shrink-0 z-10 shadow-sm relative">
                                 <div className="flex items-center gap-4">
-                                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white flex items-center justify-center font-bold text-xl shadow-md border border-primary/20">
-                                        {getNombreChat(chatActivo).charAt(0).toUpperCase()}
-                                    </div>
+                                    <Avatar 
+                                        nombre={getNombreChat(chatActivo)} 
+                                        rol={usuario?.rol === 'TUTOR' ? 'ESTUDIANTE' as Rol : 'TUTOR' as Rol}
+                                        size="md"
+                                    />
                                     <div>
                                         <h3 className="font-extrabold text-slate-900 dark:text-slate-100 text-lg leading-tight tracking-tight">
                                             {getNombreChat(chatActivo)}
