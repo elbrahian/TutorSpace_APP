@@ -32,8 +32,9 @@ axiosInstance.interceptors.response.use(
             console.error('--- ERROR 403 DETECTADO ---')
             console.error('URL fallida:', url)
             console.error('Detalle error:', error.response?.data)
-            // Valid token but insufficient permissions — do NOT log out
-            window.location.href = '/unauthorized'
+            // Valid token but insufficient permissions — do NOT log out or redirect automatically
+            // Para debuggear, permitimos que el componente maneje el error en lugar de sacar al usuario.
+            // window.location.href = '/unauthorized'
         }
 
         return Promise.reject(error)
