@@ -21,10 +21,16 @@ export default function BuscarTutores() {
 
     useEffect(() => {
         estudianteApi.getMaterias().then(data => setMaterias(data))
-        buscar() // initial load
+        // Quitamos la búsqueda inicial automática para evitar el error 403 con materiaId vacío
     }, [])
 
     const buscar = async (mId = materiaId) => {
+        // Validación: No permitir búsqueda si no hay materia seleccionada
+        if (!mId || mId === '') {
+            setTutores([])
+            return
+        }
+
         try {
             setLoading(true)
             const resp = await estudianteApi.buscarTutores(mId)
@@ -39,7 +45,7 @@ export default function BuscarTutores() {
     const handleMateriaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const val = e.target.value ? Number(e.target.value) : ''
         setMateriaId(val)
-        buscar(val)
+        // Ya no buscamos automáticamente al cambiar, esperamos al botón
     }
 
     const iniciarChat = async (tutor: TutorBusquedaResponse) => {
@@ -76,20 +82,29 @@ export default function BuscarTutores() {
 
                 <Card className="border-0 shadow-md bg-white dark:bg-slate-900 pt-6">
                     <CardContent className="flex flex-col sm:flex-row gap-4">
-                        <div className="relative flex-1">
-                            <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                            <select
-                                className="flex h-10 w-full rounded-md border border-input bg-transparent pl-10 pr-3 py-2 text-sm text-slate-900 dark:text-slate-100 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 appearance-none"
-                                value={materiaId}
-                                onChange={handleMateriaChange}
+                        <div className="flex flex-col sm:flex-row gap-4 w-full">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                                <select
+                                    className="flex h-10 w-full rounded-md border border-input bg-transparent pl-10 pr-3 py-2 text-sm text-slate-900 dark:text-slate-100 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 appearance-none"
+                                    value={materiaId}
+                                    onChange={handleMateriaChange}
+                                >
+                                    <option value="" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Selecciona una materia...</option>
+                                    {materias.map(m => (
+                                        <option key={m.id} value={m.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                                            {m.nombre} ({m.codigo})
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <Button 
+                                onClick={() => buscar()} 
+                                disabled={!materiaId || loading}
+                                className="sm:w-32"
                             >
-                                <option value="" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Todas las materias</option>
-                                {materias.map(m => (
-                                    <option key={m.id} value={m.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
-                                        {m.nombre} ({m.codigo})
-                                    </option>
-                                ))}
-                            </select>
+                                {loading ? 'Buscando...' : 'Buscar'}
+                            </Button>
                         </div>
                     </CardContent>
                 </Card>
@@ -97,6 +112,10 @@ export default function BuscarTutores() {
                 <div className="mt-8">
                     {loading ? (
                         <div className="flex justify-center py-12 text-slate-500">Buscando tutores...</div>
+                    ) : !materiaId ? (
+                        <div className="text-center py-12 text-slate-500 bg-slate-50 dark:bg-slate-900 border border-dashed rounded-xl">
+                            Por favor selecciona una materia para ver los tutores disponibles.
+                        </div>
                     ) : tutores.length === 0 ? (
                         <div className="text-center py-12 text-slate-500 bg-slate-50 dark:bg-slate-900 border border-dashed rounded-xl">
                             No se encontraron tutores disponibles para tu búsqueda.
