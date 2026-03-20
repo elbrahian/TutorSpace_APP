@@ -26,7 +26,7 @@ export default function BuscarTutores() {
 
     const buscar = async (mId = materiaId) => {
         // Validación: No permitir búsqueda si no hay materia seleccionada
-        if (!mId || mId === '') {
+        if (!mId) {
             setTutores([])
             return
         }
