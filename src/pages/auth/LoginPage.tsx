@@ -1,9 +1,10 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { useAuth } from '../../hooks/useAuth'
 import { Link } from 'react-router-dom'
-import { BookOpen } from 'lucide-react'
+import { BookOpen, Eye, EyeOff } from 'lucide-react'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { CardTitle } from '../../components/ui/card'
@@ -17,6 +18,7 @@ type LoginForm = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
     const { login, loading, error } = useAuth()
+    const [showPassword, setShowPassword] = useState(false)
     const { register, handleSubmit, formState: { errors } } = useForm<LoginForm>({
         resolver: zodResolver(loginSchema)
     })
@@ -69,12 +71,21 @@ export default function LoginPage() {
                             <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-slate-700 dark:text-slate-300">
                                 Contraseña
                             </label>
-                            <Input
-                                type="password"
-                                placeholder="••••••••"
-                                {...register('password')}
-                                className={errors.password ? 'border-red-500 focus-visible:ring-red-500' : ''}
-                            />
+                            <div className="relative">
+                                <Input
+                                    type={showPassword ? 'text' : 'password'}
+                                    placeholder="••••••••"
+                                    {...register('password')}
+                                    className={errors.password ? 'border-red-500 focus-visible:ring-red-500 pr-10' : 'pr-10'}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                                >
+                                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                                </button>
+                            </div>
                             {errors.password && <p className="text-sm text-red-500 font-medium">{errors.password.message}</p>}
                         </div>
 

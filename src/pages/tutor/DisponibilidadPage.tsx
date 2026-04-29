@@ -226,7 +226,7 @@ export default function DisponibilidadPage() {
                                                             className="text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20 h-10 w-10 shrink-0"
                                                             title="Editar franja"
                                                         >
-                                                            <Pencil className="w-4 h-4" />
+                                                            <Pencil className="w-4 h-4 text-amber-500" />
                                                         </Button>
                                                         <Button
                                                             variant="ghost"
@@ -235,7 +235,7 @@ export default function DisponibilidadPage() {
                                                             className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 h-10 w-10 shrink-0"
                                                             title="Eliminar franja"
                                                         >
-                                                            <Trash2 className="w-5 h-5" />
+                                                            <Trash2 className="w-5 h-5 text-red-500" />
                                                         </Button>
                                                     </div>
                                                 )}
@@ -280,7 +280,7 @@ export default function DisponibilidadPage() {
                                                                         className="text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20"
                                                                         title="Editar franja"
                                                                     >
-                                                                        <Pencil className="w-4 h-4" />
+                                                                        <Pencil className="w-4 h-4 text-amber-500" />
                                                                     </Button>
                                                                     <Button
                                                                         variant="ghost"
@@ -289,7 +289,7 @@ export default function DisponibilidadPage() {
                                                                         className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
                                                                         title="Eliminar franja"
                                                                     >
-                                                                        <Trash2 className="w-4 h-4" />
+                                                                        <Trash2 className="w-4 h-4 text-red-500" />
                                                                     </Button>
                                                                 </div>
                                                             )}

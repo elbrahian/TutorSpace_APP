@@ -187,10 +187,11 @@ export function AgendarSesionDialog({ open, onClose, chat, onSesionCreada }: Pro
                     {selectedDispo && (
                         <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-bottom-2">
                             <h4 className="text-sm font-semibold text-slate-800 dark:text-slate-200">2. Confirma la fecha</h4>
-                            <div className="flex flex-col gap-2">
+                            <div className="flex flex-col gap-2 relative">
+                                <CalendarIcon className="absolute left-3 top-3 w-4 h-4 text-slate-400 pointer-events-none" />
                                 <input 
                                     type="date" 
-                                    className="flex h-10 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+                                    className="flex h-10 w-full rounded-md border border-input bg-transparent pl-10 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 text-slate-900 dark:text-slate-100"
                                     {...register('fecha')}
                                     onChange={(e) => {
                                         const date = new Date(e.target.value + 'T00:00:00')
