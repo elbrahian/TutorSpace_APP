@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react'
 import { Navbar } from './Navbar'
 import { Sidebar } from './Sidebar'
+import { useWebSocket } from '../../hooks/useWebSocket'
 
 interface Props {
     children: ReactNode
@@ -8,6 +9,8 @@ interface Props {
 
 export const DashboardLayout = ({ children }: Props) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+    // Inicializa la conexión STOMP singleton para toda la sesión autenticada
+    useWebSocket()
 
     const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen)
     const closeSidebar = () => setIsSidebarOpen(false)

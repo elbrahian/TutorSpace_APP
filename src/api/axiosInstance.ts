@@ -5,6 +5,11 @@ const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080',
 })
 
+// Capa 2 (Bug 4): Deshabilitar caché del navegador para todas las peticiones GET
+// Evita que el navegador retorne respuestas cacheadas cuando el servidor ya tiene datos nuevos
+axiosInstance.defaults.headers.get['Cache-Control'] = 'no-cache'
+axiosInstance.defaults.headers.get['Pragma'] = 'no-cache'
+
 axiosInstance.interceptors.request.use(
     (config) => {
         const token = useAuthStore.getState().token

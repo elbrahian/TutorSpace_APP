@@ -8,7 +8,7 @@ import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
 import { tutorApi } from '../../api/tutorApi'
 import type { DisponibilidadResponse } from '../../types'
-import { Plus, Trash2, Clock } from 'lucide-react'
+import { Plus, Trash2, Clock, Pencil, X } from 'lucide-react'
 
 const disponibilidadSchema = z.object({
     dia: z.enum(['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO']),
@@ -21,6 +21,8 @@ type DisponibilidadForm = z.infer<typeof disponibilidadSchema>
 export default function DisponibilidadPage() {
     const [franjas, setFranjas] = useState<DisponibilidadResponse[]>([])
     const [loading, setLoading] = useState(false)
+    const [editandoFranja, setEditandoFranja] = useState<DisponibilidadResponse | null>(null)
+    const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
     const { register, handleSubmit, reset, formState: { errors } } = useForm<DisponibilidadForm>({
         resolver: zodResolver(disponibilidadSchema)
@@ -39,20 +41,57 @@ export default function DisponibilidadPage() {
         }
     }
 
+    // Precarga el formulario usando reset() — es la forma correcta en react-hook-form
+    // (setValue múltiple no marca los campos como validados correctamente con zodResolver)
+    const iniciarEdicion = (f: DisponibilidadResponse) => {
+        setErrorMsg(null)
+        setEditandoFranja(f)
+        reset({
+            dia: f.dia as DisponibilidadForm['dia'],
+            horaInicio: f.horaInicio.slice(0, 5),
+            horaFin: f.horaFin.slice(0, 5),
+        })
+    }
+
+    const cancelarEdicion = () => {
+        setEditandoFranja(null)
+        setErrorMsg(null)
+        reset({ dia: 'LUNES', horaInicio: '', horaFin: '' })
+    }
+
     const onSubmit = async (data: DisponibilidadForm) => {
+        setErrorMsg(null)
         try {
             setLoading(true)
-            await tutorApi.crearDisponibilidad({
-                dia: data.dia,
-                horaInicio: `${data.horaInicio}:00`,
-                horaFin: `${data.horaFin}:00`
-            })
-            reset()
-            cargarFranjas()
-        } catch (e) {
+
+            if (editandoFranja) {
+                // Simular PATCH con DELETE + POST (el backend no tiene PATCH para disponibilidad)
+                await tutorApi.eliminarDisponibilidad(editandoFranja.id)
+                await tutorApi.crearDisponibilidad({
+                    dia: data.dia,
+                    horaInicio: `${data.horaInicio}:00`,
+                    horaFin: `${data.horaFin}:00`
+                })
+                setEditandoFranja(null)
+            } else {
+                await tutorApi.crearDisponibilidad({
+                    dia: data.dia,
+                    horaInicio: `${data.horaInicio}:00`,
+                    horaFin: `${data.horaFin}:00`
+                })
+            }
+
+            reset({ dia: 'LUNES', horaInicio: '', horaFin: '' })
+        } catch (e: any) {
             console.error(e)
+            setErrorMsg(
+                e?.response?.data?.message ||
+                (typeof e?.response?.data === 'string' ? e.response.data : 'Error al guardar la franja. Intenta de nuevo.')
+            )
         } finally {
             setLoading(false)
+            // Recargar siempre para reflejar el estado real del backend
+            cargarFranjas()
         }
     }
 
@@ -77,10 +116,19 @@ export default function DisponibilidadPage() {
                     <Card className="lg:col-span-1 shadow-sm border-slate-200 dark:border-slate-800">
                         <CardHeader className="bg-slate-50/50 dark:bg-slate-900/50 border-b">
                             <CardTitle className="text-lg flex items-center gap-2">
-                                <Plus className="w-5 h-5 text-primary" /> Nueva Franja
+                                {editandoFranja ? (
+                                    <><Pencil className="w-5 h-5 text-amber-500" /> Editar Franja</>
+                                ) : (
+                                    <><Plus className="w-5 h-5 text-primary" /> Nueva Franja</>
+                                )}
                             </CardTitle>
                         </CardHeader>
                         <CardContent className="pt-6">
+                            {editandoFranja && (
+                                <div className="mb-4 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-500/30 text-sm text-amber-700 dark:text-amber-400">
+                                    Editando: <strong>{editandoFranja.dia}</strong> — {editandoFranja.horaInicio.slice(0, 5)} a {editandoFranja.horaFin.slice(0, 5)}
+                                </div>
+                            )}
                             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                                 <div className="space-y-2">
                                     <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Día de la semana</label>
@@ -112,9 +160,25 @@ export default function DisponibilidadPage() {
                                     </div>
                                 </div>
 
-                                <Button type="submit" className="w-full mt-2" disabled={loading}>
-                                    {loading ? 'Guardando...' : 'Agregar Franja'}
-                                </Button>
+                                <div className="flex gap-2 mt-2">
+                                    <Button type="submit" className="flex-1" disabled={loading}>
+                                        {loading
+                                            ? 'Guardando...'
+                                            : editandoFranja ? 'Guardar Cambios' : 'Agregar Franja'
+                                        }
+                                    </Button>
+                                    {editandoFranja && (
+                                        <Button type="button" variant="outline" onClick={cancelarEdicion} className="shrink-0">
+                                            <X className="w-4 h-4 mr-1" /> Cancelar
+                                        </Button>
+                                    )}
+                                </div>
+
+                                {errorMsg && (
+                                    <div className="p-3 rounded-md bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-400 text-sm">
+                                        {errorMsg}
+                                    </div>
+                                )}
                             </form>
                         </CardContent>
                     </Card>
@@ -151,17 +215,29 @@ export default function DisponibilidadPage() {
                                                         {f.horaInicio.slice(0, 5)} - {f.horaFin.slice(0, 5)}
                                                     </div>
                                                 </div>
-                                                
+
                                                 {f.estado === 'DISPONIBLE' && (
-                                                    <Button
-                                                        variant="ghost"
-                                                        size="icon"
-                                                        onClick={() => eliminar(f.id)}
-                                                        className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 h-10 w-10 shrink-0"
-                                                        title="Eliminar franja"
-                                                    >
-                                                        <Trash2 className="w-5 h-5" />
-                                                    </Button>
+                                                    <div className="flex gap-1">
+                                                        {/* Bug 1: Botón editar en vista móvil */}
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => iniciarEdicion(f)}
+                                                            className="text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20 h-10 w-10 shrink-0"
+                                                            title="Editar franja"
+                                                        >
+                                                            <Pencil className="w-4 h-4" />
+                                                        </Button>
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="icon"
+                                                            onClick={() => eliminar(f.id)}
+                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 h-10 w-10 shrink-0"
+                                                            title="Eliminar franja"
+                                                        >
+                                                            <Trash2 className="w-5 h-5" />
+                                                        </Button>
+                                                    </div>
                                                 )}
                                             </div>
                                         ))}
@@ -195,15 +271,27 @@ export default function DisponibilidadPage() {
                                                         </td>
                                                         <td className="px-6 py-4 text-right">
                                                             {f.estado === 'DISPONIBLE' && (
-                                                                <Button
-                                                                    variant="ghost"
-                                                                    size="icon"
-                                                                    onClick={() => eliminar(f.id)}
-                                                                    className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                                                    title="Eliminar franja"
-                                                                >
-                                                                    <Trash2 className="w-4 h-4" />
-                                                                </Button>
+                                                                <div className="flex justify-end gap-1">
+                                                                    {/* Bug 1: Botón editar en vista desktop */}
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => iniciarEdicion(f)}
+                                                                        className="text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20"
+                                                                        title="Editar franja"
+                                                                    >
+                                                                        <Pencil className="w-4 h-4" />
+                                                                    </Button>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="icon"
+                                                                        onClick={() => eliminar(f.id)}
+                                                                        className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                                                                        title="Eliminar franja"
+                                                                    >
+                                                                        <Trash2 className="w-4 h-4" />
+                                                                    </Button>
+                                                                </div>
                                                             )}
                                                         </td>
                                                     </tr>

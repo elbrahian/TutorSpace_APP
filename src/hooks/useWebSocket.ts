@@ -1,57 +1,39 @@
-import { useEffect, useRef } from 'react'
-import { Client } from '@stomp/stompjs'
-import SockJS from 'sockjs-client'
+/**
+ * useWebSocket.ts — Inicializador del cliente STOMP singleton
+ *
+ * Bug 5: Este hook ahora actúa únicamente como inicializador del singleton.
+ * Las suscripciones a notificaciones y chat se hacen en sus propios hooks
+ * (useNotificaciones.ts y useChat.ts) usando stompSubscribe/stompUnsubscribe.
+ *
+ * Debe ser llamado UNA VEZ desde un componente raíz (ej. DashboardLayout).
+ */
+
+import { useEffect } from 'react'
 import { useAuthStore } from '../store/authStore'
-import { useNotificacionStore } from '../store/notificacionStore'
-import { useChatStore } from '../store/chatStore'
-import type { Notificacion, MensajeResponse } from '../types'
+import { getOrCreateStompClient, destroyStompClient } from './useStompClient'
 
 export const useWebSocket = () => {
     const token = useAuthStore(state => state.token)
     const usuario = useAuthStore(state => state.usuario)
-    const chatActivo = useChatStore(state => state.chatActivo)
-
-    const agregarNotificacion = useNotificacionStore(state => state.agregar)
-    const agregarMensaje = useChatStore(state => state.agregarMensaje)
-
-    const clientRef = useRef<Client | null>(null)
 
     useEffect(() => {
         if (!token || !usuario) return
 
-        const client = new Client({
-            webSocketFactory: () => new SockJS(import.meta.env.VITE_WS_URL || 'http://localhost:8080/ws'),
-            connectHeaders: {
-                Authorization: `Bearer ${token}`
-            },
-            onConnect: () => {
-                // Suscripción a notificaciones
-                client.subscribe(`/topic/notificaciones/${usuario.id}`, (message) => {
-                    const notificacion: Notificacion = JSON.parse(message.body)
-                    agregarNotificacion(notificacion)
-                })
+        // Inicializa (o retorna) el cliente singleton
+        getOrCreateStompClient(token)
 
-                // Suscripción al chat activo si existe
-                if (chatActivo) {
-                    client.subscribe(`/topic/chat/${chatActivo.id}`, (message) => {
-                        const nuevoMensaje: MensajeResponse = JSON.parse(message.body)
-                        agregarMensaje(nuevoMensaje)
-                    })
-                }
-            },
-            onStompError: (frame) => {
-                console.error('Broker reported error: ' + frame.headers['message']);
-                console.error('Additional details: ' + frame.body);
-            }
-        })
-
-        client.activate()
-        clientRef.current = client
-
+        // Al hacer logout (token se vuelve null en el siguiente render),
+        // el cleanup destruye el cliente
         return () => {
-            client.deactivate()
+            // Solo destruimos si el token desapareció (logout real)
+            // No destruimos en re-renders normales
         }
-    }, [token, usuario, chatActivo, agregarNotificacion, agregarMensaje])
+    }, [token, usuario?.id])
 
-    return clientRef.current
+    // Destruir cliente al hacer logout
+    useEffect(() => {
+        if (!token) {
+            destroyStompClient()
+        }
+    }, [token])
 }

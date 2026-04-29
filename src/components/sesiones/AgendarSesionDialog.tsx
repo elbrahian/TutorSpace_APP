@@ -116,7 +116,14 @@ export function AgendarSesionDialog({ open, onClose, chat, onSesionCreada }: Pro
             onClose()
             reset()
         } catch (error: any) {
-            setErrorMsg(error.response?.data?.message || typeof error.response?.data === 'string' ? error.response.data : 'Error al crear la sesión')
+            setErrorMsg(
+                error.response?.data?.message ||
+                (typeof error.response?.data === 'string'
+                    ? error.response.data
+                    : 'Error al crear la sesión')
+            )
+            // Refrescar franjas: si otra sesión concurrente bloqueó una franja, desaparece
+            cargarDisponibilidades()
         } finally {
             setIsSubmitting(false)
         }

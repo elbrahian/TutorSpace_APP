@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { DashboardLayout } from '../../components/layout/DashboardLayout'
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
 import { sesionApi } from '../../api/sesionApi'
 import type { SesionResponse, DisponibilidadResponse } from '../../types'
-import { Calendar, Clock, ArrowRight, CheckCircle, ShieldCheck } from 'lucide-react'
+import { Calendar, Clock, ArrowRight, CheckCircle, ShieldCheck, MessageSquare } from 'lucide-react'
 import { formatDate } from '../../utils/formatDate'
 import { tutorApi } from '../../api/tutorApi'
+import { Button } from '../../components/ui/button'
 
 export default function TutorDashboard() {
     const [sesionesDia, setSesionesDia] = useState<SesionResponse[]>([])
     const [franjas, setFranjas] = useState<DisponibilidadResponse[]>([])
     const [loading, setLoading] = useState(true)
+    const navigate = useNavigate()
 
     useEffect(() => {
         const fetchData = async () => {
@@ -74,6 +76,9 @@ export default function TutorDashboard() {
                                 <p className="text-slate-500 text-center text-sm">
                                     Revisa tu calendario completo, aprueba/rechaza solicitudes y agenda nuevas tutorías.
                                 </p>
+                                <p className="text-xs text-slate-400 dark:text-slate-500 text-center mt-1">
+                                    Las sesiones se agendan desde el chat con cada estudiante.
+                                </p>
                                 <div className="text-primary text-sm font-medium flex items-center gap-1 mt-2">
                                     Ver calendario <ArrowRight className="w-4 h-4" />
                                 </div>
@@ -130,8 +135,21 @@ export default function TutorDashboard() {
                             {loading ? (
                                 <div className="flex justify-center p-8 text-slate-500">Cargando...</div>
                             ) : sesionesDia.length === 0 ? (
-                                <div className="text-center p-8 text-slate-500 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-dashed">
-                                    No tienes sesiones programadas próximamente. ¡Aprovecha para descansar o investigara!
+                                <div className="space-y-4">
+                                    <div className="text-center p-6 text-slate-500 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-dashed">
+                                        No tienes sesiones programadas próximamente.
+                                    </div>
+                                    {/* Bug 3: Banner informativo para guiar al tutor */}
+                                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 rounded-xl border border-primary/20 bg-primary/5 dark:bg-primary/10">
+                                        <MessageSquare className="w-5 h-5 text-primary shrink-0 mt-0.5 sm:mt-0" />
+                                        <div className="flex-1 text-sm text-slate-600 dark:text-slate-400">
+                                            <span className="font-semibold text-slate-800 dark:text-slate-200">¿Quieres agendar una sesión?</span>{' '}
+                                            Ve al Chat con el estudiante y usa el botón <strong>"Agendar Sesión"</strong> desde la conversación.
+                                        </div>
+                                        <Button size="sm" variant="outline" onClick={() => navigate('/tutor/chat')} className="shrink-0 border-primary/30 text-primary hover:bg-primary/10">
+                                            Ir al Chat
+                                        </Button>
+                                    </div>
                                 </div>
                             ) : (
                                 <div className="space-y-3">

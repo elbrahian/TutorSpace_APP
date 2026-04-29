@@ -1,9 +1,20 @@
-import { useEffect, useRef } from 'react'
-import { Client } from '@stomp/stompjs'
-import SockJS from 'sockjs-client'
+/**
+ * useChat.ts
+ *
+ * Bug 5: Eliminado el bloque que creaba un Client STOMP propio.
+ *        Ahora usa stompSubscribe/stompUnsubscribe del singleton.
+ *
+ * Bug 6: El estado 'stompConnected' se mantiene para garantizar que la
+ *        suscripción al chat activo ocurra sólo cuando el cliente esté listo,
+ *        sin necesidad del setTimeout recursivo previo.
+ *        El singleton expone un callback onReady para notificar al hook.
+ */
+
+import { useEffect, useRef, useState } from 'react'
 import { chatApi } from '../api/chatApi'
 import { useChatStore } from '../store/chatStore'
 import { useAuthStore } from '../store/authStore'
+import { stompSubscribe, stompUnsubscribe, getOrCreateStompClient } from './useStompClient'
 import type { ChatResponse, MensajeResponse } from '../types'
 
 export const useChat = () => {
@@ -12,9 +23,11 @@ export const useChat = () => {
         chats, chatActivo, mensajes, cargando,
         setChats, setChatActivo, setMensajes, agregarMensaje, setCargando 
     } = useChatStore()
-    
-    const clientRef = useRef<Client | null>(null)
-    const subscriptionRef = useRef<any>(null)
+
+    // Bug 6: Estado reactivo para saber cuándo el singleton está conectado
+    const [stompConnected, setStompConnected] = useState(false)
+    // Referencia al topic activo para limpiar al cambiar de chat
+    const activeChatTopicRef = useRef<string | null>(null)
 
     // Cargar mis chats
     const cargarChats = async () => {
@@ -31,7 +44,7 @@ export const useChat = () => {
         if (usuario?.rol !== 'ESTUDIANTE') return
         try {
             const resp = await chatApi.iniciarChat(tutorId)
-            await cargarChats() // refresh
+            await cargarChats()
             setChatActivo(resp)
         } catch (error) {
             console.error('Error al iniciar chat:', error)
@@ -45,7 +58,7 @@ export const useChat = () => {
             await chatApi.enviarMensaje(chatActivo.id, contenido)
             // No lo agregamos manualmente porque lo recibiremos vía WebSocket
         } catch (error: any) {
-            console.error('Error detallado de Spring Boot al enviar mensaje:', error.response?.data || error)
+            console.error('Error al enviar mensaje:', error.response?.data || error)
         }
     }
 
@@ -54,52 +67,53 @@ export const useChat = () => {
         return usuario?.rol === 'ESTUDIANTE' ? chat.nombreTutor : chat.nombreEstudiante
     }
 
-    // Conectar WS
+    // Bug 5+6: Inicializar el singleton y monitorear su estado de conexión
     useEffect(() => {
-        if (!token) return
+        if (!token || !usuario) return
 
-        const client = new Client({
-            webSocketFactory: () => new SockJS(import.meta.env.VITE_WS_URL || 'http://localhost:8080/ws'),
-            connectHeaders: {
-                Authorization: `Bearer ${token}`
-            },
-            onConnect: () => {
-                console.log('STOMP: Conectado')
-            },
-            onStompError: (frame) => {
-                console.error('Broker reported error: ' + frame.headers['message'])
-                console.error('Additional details: ' + frame.body)
-            }
-        })
+        const client = getOrCreateStompClient(token)
 
-        client.activate()
-        clientRef.current = client
+        // Consultar estado actual (puede que ya esté conectado si useWebSocket lo inició antes)
+        if (client.connected) {
+            setStompConnected(true)
+            return
+        }
+
+        // Parcheamos onConnect para detectar la conexión en este hook también
+        const originalOnConnect = client.onConnect?.bind(client)
+        client.onConnect = (frame) => {
+            originalOnConnect?.(frame)
+            setStompConnected(true)
+        }
+
+        const originalOnDisconnect = client.onDisconnect?.bind(client)
+        client.onDisconnect = (frame) => {
+            originalOnDisconnect?.(frame)
+            setStompConnected(false)
+        }
 
         return () => {
-            if (subscriptionRef.current) {
-                subscriptionRef.current.unsubscribe()
-            }
-            client.deactivate()
+            setStompConnected(false)
         }
-    }, [token])
+    }, [token, usuario?.id])
 
-    // Manejar cambios en chat activo
+    // Bug 5+6: Suscribirse al chat activo a través del singleton cuando está conectado
     useEffect(() => {
         if (!chatActivo) {
-            if (subscriptionRef.current) {
-                subscriptionRef.current.unsubscribe()
-                subscriptionRef.current = null
+            // Limpiar suscripción anterior si hay
+            if (activeChatTopicRef.current) {
+                stompUnsubscribe(activeChatTopicRef.current)
+                activeChatTopicRef.current = null
             }
             return
         }
 
+        // Cargar mensajes históricos
         const cargarMensajes = async () => {
             try {
                 setCargando(true)
                 const resp = await chatApi.getMensajes(chatActivo.id)
-                // Asegurar que los mensajes se muestren en orden cronológico 
-                // (antiguos arriba, nuevos abajo)
-                const ordenados = [...resp.content].sort((a, b) => 
+                const ordenados = [...resp.content].sort((a, b) =>
                     new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
                 )
                 setMensajes(ordenados)
@@ -112,30 +126,31 @@ export const useChat = () => {
 
         cargarMensajes()
 
-        // Suscribirse si el websocket ya está conectado
-        const suscribirse = () => {
-            if (!clientRef.current?.connected) {
-                // Si aún no está conectado, reintentar en breve
-                setTimeout(suscribirse, 500)
-                return
-            }
-            
-            if (subscriptionRef.current) {
-                subscriptionRef.current.unsubscribe()
-            }
+        // Bug 6: Solo suscribirse si el cliente singleton ya está conectado.
+        // Si aún no lo está, el efecto se re-ejecutará cuando stompConnected cambie a true.
+        if (!stompConnected) return
 
-            subscriptionRef.current = clientRef.current.subscribe(
-                `/topic/chat/${chatActivo.id}`,
-                (mensajeStomp) => {
-                    const mensajeBody: MensajeResponse = JSON.parse(mensajeStomp.body)
-                    agregarMensaje(mensajeBody)
-                }
-            )
+        const topic = `/topic/chat/${chatActivo.id}`
+
+        // Desuscribir del topic anterior si cambió el chat
+        if (activeChatTopicRef.current && activeChatTopicRef.current !== topic) {
+            stompUnsubscribe(activeChatTopicRef.current)
         }
 
-        suscribirse()
+        activeChatTopicRef.current = topic
 
-    }, [chatActivo, clientRef.current?.connected])
+        stompSubscribe(topic, (mensajeStomp: any) => {
+            const mensajeBody: MensajeResponse = JSON.parse(mensajeStomp.body)
+            agregarMensaje(mensajeBody)
+        })
+
+        return () => {
+            if (activeChatTopicRef.current) {
+                stompUnsubscribe(activeChatTopicRef.current)
+                activeChatTopicRef.current = null
+            }
+        }
+    }, [chatActivo, stompConnected]) // Bug 6: stompConnected como dependencia reactiva
 
     return {
         chats,

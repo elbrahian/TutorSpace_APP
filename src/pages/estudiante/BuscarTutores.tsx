@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { DashboardLayout } from '../../components/layout/DashboardLayout'
 import { Card, CardContent } from '../../components/ui/card'
@@ -7,7 +7,8 @@ import { estudianteApi } from '../../api/estudianteApi'
 import { chatApi } from '../../api/chatApi'
 import { useChatStore } from '../../store/chatStore'
 import type { MateriaResponse, TutorBusquedaResponse } from '../../types'
-import { Search, MessageSquare, Clock } from 'lucide-react'
+import { Search, MessageSquare, Clock, RefreshCw } from 'lucide-react'
+import { tiempoRelativo } from '../../utils/formatDate'
 
 export default function BuscarTutores() {
     const [materias, setMaterias] = useState<MateriaResponse[]>([])
@@ -16,36 +17,71 @@ export default function BuscarTutores() {
     const [loading, setLoading] = useState(false)
     const [chatLoadingId, setChatLoadingId] = useState<number | null>(null)
 
+    // Bug 4 — Capa 1: Polling silencioso
+    const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null)
+    const [buscadoAlMenosUnaVez, setBuscadoAlMenosUnaVez] = useState(false)
+    // Indicador visual sutil de última actualización
+    const [ultimaActualizacion, setUltimaActualizacion] = useState<Date | null>(null)
+
     const navigate = useNavigate()
     const setChatActivo = useChatStore(state => state.setChatActivo)
 
     useEffect(() => {
         estudianteApi.getMaterias().then(data => setMaterias(data))
-        // Quitamos la búsqueda inicial automática para evitar el error 403 con materiaId vacío
     }, [])
 
-    const buscar = async (mId = materiaId) => {
-        // Validación: No permitir búsqueda si no hay materia seleccionada
+    /**
+     * buscar: acepta un flag `silencioso` para los pollings automáticos.
+     * Cuando es silencioso NO muestra el spinner para no interrumpir al usuario.
+     */
+    const buscar = async (mId = materiaId, silencioso = false) => {
         if (!mId) {
             setTutores([])
             return
         }
 
         try {
-            setLoading(true)
+            if (!silencioso) setLoading(true)
             const resp = await estudianteApi.buscarTutores(mId)
             setTutores(resp.content)
+            // Marcar primera búsqueda exitosa y timestamp de actualización
+            setBuscadoAlMenosUnaVez(true)
+            setUltimaActualizacion(new Date())
         } catch (e) {
             console.error(e)
         } finally {
-            setLoading(false)
+            if (!silencioso) setLoading(false)
         }
     }
 
+    // Bug 4 — Capa 1: Polling cada 30s — solo activo si ya se buscó y hay materia seleccionada
+    useEffect(() => {
+        if (!buscadoAlMenosUnaVez || !materiaId) {
+            if (pollingRef.current) clearInterval(pollingRef.current)
+            return
+        }
+
+        pollingRef.current = setInterval(() => {
+            buscar(materiaId, true) // silencioso: sin spinner
+        }, 30000)
+
+        return () => {
+            if (pollingRef.current) clearInterval(pollingRef.current)
+        }
+    }, [buscadoAlMenosUnaVez, materiaId])
+
+    // Bug 4 — Caso borde: al cambiar materia, resetear estado de polling
     const handleMateriaChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const val = e.target.value ? Number(e.target.value) : ''
         setMateriaId(val)
-        // Ya no buscamos automáticamente al cambiar, esperamos al botón
+        // Limpiar resultados y estado de polling para la materia anterior
+        setBuscadoAlMenosUnaVez(false)
+        setTutores([])
+        setUltimaActualizacion(null)
+        if (pollingRef.current) {
+            clearInterval(pollingRef.current)
+            pollingRef.current = null
+        }
     }
 
     const iniciarChat = async (tutor: TutorBusquedaResponse) => {
@@ -55,8 +91,7 @@ export default function BuscarTutores() {
             setChatActivo(chat)
             navigate('/estudiante/chat')
         } catch (e) {
-            console.error("Error iniciando chat", e)
-            // Si falla porque el chat ya existe u otro error, buscamos el existente y redirigimos
+            console.error('Error iniciando chat', e)
             try {
                 const misChats = await chatApi.getMisChats()
                 const chatExistente = misChats.find(c => c.tutorId === tutor.id)
@@ -65,7 +100,7 @@ export default function BuscarTutores() {
                     navigate('/estudiante/chat')
                 }
             } catch (innerError) {
-                console.error("Error buscando chat existente", innerError)
+                console.error('Error buscando chat existente', innerError)
             }
         } finally {
             setChatLoadingId(null)
@@ -82,29 +117,40 @@ export default function BuscarTutores() {
 
                 <Card className="border-0 shadow-md bg-white dark:bg-slate-900 pt-6">
                     <CardContent className="flex flex-col sm:flex-row gap-4">
-                        <div className="flex flex-col sm:flex-row gap-4 w-full">
-                            <div className="relative flex-1">
-                                <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
-                                <select
-                                    className="flex h-10 w-full rounded-md border border-input bg-transparent pl-10 pr-3 py-2 text-sm text-slate-900 dark:text-slate-100 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 appearance-none"
-                                    value={materiaId}
-                                    onChange={handleMateriaChange}
+                        <div className="flex flex-col gap-2 w-full">
+                            <div className="flex flex-col sm:flex-row gap-4 w-full">
+                                <div className="relative flex-1">
+                                    <Search className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                                    <select
+                                        className="flex h-10 w-full rounded-md border border-input bg-transparent pl-10 pr-3 py-2 text-sm text-slate-900 dark:text-slate-100 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 appearance-none"
+                                        value={materiaId}
+                                        onChange={handleMateriaChange}
+                                    >
+                                        <option value="" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Selecciona una materia...</option>
+                                        {materias.map(m => (
+                                            <option key={m.id} value={m.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
+                                                {m.nombre} ({m.codigo})
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <Button
+                                    onClick={() => buscar()}
+                                    disabled={!materiaId || loading}
+                                    className="sm:w-32"
                                 >
-                                    <option value="" className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">Selecciona una materia...</option>
-                                    {materias.map(m => (
-                                        <option key={m.id} value={m.id} className="bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100">
-                                            {m.nombre} ({m.codigo})
-                                        </option>
-                                    ))}
-                                </select>
+                                    {loading ? 'Buscando...' : 'Buscar'}
+                                </Button>
                             </div>
-                            <Button 
-                                onClick={() => buscar()} 
-                                disabled={!materiaId || loading}
-                                className="sm:w-32"
-                            >
-                                {loading ? 'Buscando...' : 'Buscar'}
-                            </Button>
+
+                            {/* Bug 4: Indicador visual sutil de última actualización */}
+                            {ultimaActualizacion && (
+                                <p className="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1.5">
+                                    <RefreshCw className="w-3 h-3" />
+                                    Actualizado {tiempoRelativo(ultimaActualizacion.toISOString())}
+                                    {' · '}se refresca automáticamente cada 30 segundos
+                                </p>
+                            )}
                         </div>
                     </CardContent>
                 </Card>

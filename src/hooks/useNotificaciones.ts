@@ -1,9 +1,16 @@
-import { useEffect, useRef } from 'react'
-import { Client } from '@stomp/stompjs'
-import SockJS from 'sockjs-client'
+/**
+ * useNotificaciones.ts
+ *
+ * Bug 5: Eliminado el bloque que creaba un Client STOMP propio.
+ * Ahora usa stompSubscribe/stompUnsubscribe del singleton para suscribirse
+ * al topic de notificaciones del usuario actual.
+ */
+
+import { useEffect } from 'react'
 import { notificacionApi } from '../api/notificacionApi'
 import { useNotificacionStore } from '../store/notificacionStore'
 import { useAuthStore } from '../store/authStore'
+import { stompSubscribe, stompUnsubscribe } from './useStompClient'
 import type { Notificacion } from '../types'
 
 export const useNotificaciones = () => {
@@ -17,9 +24,7 @@ export const useNotificaciones = () => {
         marcarTodasLeidas: marcarStoreTodasLeidas
     } = useNotificacionStore()
 
-    const clientRef = useRef<Client | null>(null)
-
-    // Cargar notificaciones
+    // Cargar notificaciones históricas desde la API
     useEffect(() => {
         if (!token || !usuario) return
 
@@ -28,53 +33,38 @@ export const useNotificaciones = () => {
                 const data = await notificacionApi.getNotificaciones()
                 setTodas(data)
             } catch (error) {
-                console.error("Error al cargar notificaciones:", error)
+                console.error('Error al cargar notificaciones:', error)
             }
         }
         cargar()
     }, [token, usuario?.id])
 
-    // Conectar WebSocket para notificaciones
+    // Bug 5: Suscribirse al topic via singleton — no crea un Client nuevo
     useEffect(() => {
         if (!token || !usuario) return
 
-        const client = new Client({
-            webSocketFactory: () => new SockJS(import.meta.env.VITE_WS_URL || 'http://localhost:8080/ws'),
-            connectHeaders: {
-                Authorization: `Bearer ${token}`
-            },
-            onConnect: () => {
-                console.log('STOMP (Notificaciones): Conectado')
-                
-                client.subscribe(`/topic/notificaciones/${usuario.id}`, (msg) => {
-                    try {
-                        const notif: Notificacion = JSON.parse(msg.body)
-                        agregar(notif)
-                    } catch (e) {
-                        console.error("Error procesando notificación", e)
-                    }
-                })
-            },
-            onStompError: (frame) => {
-                console.error('Broker reported error (Notificaciones): ' + frame.headers['message'])
+        const topic = `/topic/notificaciones/${usuario.id}`
+
+        stompSubscribe(topic, (msg: any) => {
+            try {
+                const notif: Notificacion = JSON.parse(msg.body)
+                agregar(notif)
+            } catch (e) {
+                console.error('Error procesando notificación', e)
             }
         })
 
-        client.activate()
-        clientRef.current = client
-
         return () => {
-            client.deactivate()
+            stompUnsubscribe(topic)
         }
     }, [token, usuario?.id])
 
     const marcarLeida = async (id: number) => {
-        // Optimistic update
         marcarStoreLeida(id)
         try {
             await notificacionApi.marcarLeida(id)
         } catch (error) {
-            console.error("Error al marcar como leída:", error)
+            console.error('Error al marcar como leída:', error)
         }
     }
 
@@ -86,7 +76,7 @@ export const useNotificaciones = () => {
         try {
             await Promise.all(noLeidasList.map(n => notificacionApi.marcarLeida(n.id)))
         } catch (error) {
-            console.error("Error al marcar todas como leídas:", error)
+            console.error('Error al marcar todas como leídas:', error)
         }
     }
 
