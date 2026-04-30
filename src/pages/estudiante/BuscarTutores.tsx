@@ -42,7 +42,9 @@ export default function BuscarTutores() {
 
         try {
             if (!silencioso) setLoading(true)
-            const resp = await estudianteApi.buscarTutores(mId)
+            // Pedimos 50 tutores por página (tamaño suficientemente grande) para evitar 
+            // que la paginación del backend limite los resultados visibles a los 3 primeros.
+            const resp = await estudianteApi.buscarTutores(mId, 0, 50)
             setTutores(resp.content)
             // Marcar primera búsqueda exitosa y timestamp de actualización
             setBuscadoAlMenosUnaVez(true)
@@ -198,11 +200,17 @@ export default function BuscarTutores() {
                                         <div className="mb-6">
                                             <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Días Disponibles</h4>
                                             <div className="flex flex-wrap gap-1.5">
-                                                {t.diasDisponibles.map(dia => (
-                                                    <span key={dia} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                                                        {dia}
+                                                {t.diasDisponibles && t.diasDisponibles.length > 0 ? (
+                                                    t.diasDisponibles.map(dia => (
+                                                        <span key={dia} className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                                                            {dia}
+                                                        </span>
+                                                    ))
+                                                ) : (
+                                                    <span className="text-xs text-slate-400 italic bg-slate-50 dark:bg-slate-800/50 px-2 py-0.5 rounded border border-dashed border-slate-200 dark:border-slate-700">
+                                                        Sin horario asignado
                                                     </span>
-                                                ))}
+                                                )}
                                             </div>
                                         </div>
 
