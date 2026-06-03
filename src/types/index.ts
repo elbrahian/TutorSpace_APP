@@ -79,6 +79,16 @@ export interface Notificacion {
     leida: boolean
 }
 
+export interface ReporteDesempenoTutorResponse {
+    tutorId: number
+    nombreTutor: string
+    totalSesiones: number
+    sesionesCompletadas: number | null
+    sesionesCanceladas: number
+    porcentajeCancelacion: number
+    promedioCalificacion: number | null
+}
+
 export interface PageResponse<T> {
     content: T[]
     totalPages: number

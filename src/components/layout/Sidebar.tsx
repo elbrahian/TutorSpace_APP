@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock } from 'lucide-react'
+import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock, BarChart3 } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 
 interface SidebarProps {
@@ -20,6 +20,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     { name: 'Dashboard', path: '/admin', icon: <LayoutDashboard className="w-5 h-5" /> },
                     { name: 'Tutores', path: '/admin/tutores', icon: <Users className="w-5 h-5" /> },
                     { name: 'Materias', path: '/admin/materias', icon: <BookOpen className="w-5 h-5" /> },
+                    { name: 'Desempeño', path: '/admin/reportes/tutores', icon: <BarChart3 className="w-5 h-5" /> },
                 ]
             case 'TUTOR':
                 return [
