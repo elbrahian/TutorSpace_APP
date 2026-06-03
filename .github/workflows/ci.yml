@@ -14,11 +14,14 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
 
-      - name: Instalar Node 18
+      - name: Instalar Node 20
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
+
+      - name: Limpiar caché npm
+        run: npm cache clean --force
 
       - name: Instalar dependencias
         run: npm ci
