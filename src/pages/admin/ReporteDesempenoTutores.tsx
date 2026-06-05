@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { isAxiosError } from 'axios'
 import { AlertCircle, ArrowDown, ArrowUp, ArrowUpDown, Download, Loader2, RefreshCw, Search } from 'lucide-react'
 import { DashboardLayout } from '../../components/layout/DashboardLayout'
@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/button'
 import { Card, CardContent } from '../../components/ui/card'
 import { Input } from '../../components/ui/input'
 import { reportesApi } from '../../api/reportesApi'
+import { exportarReportePdf } from '../../utils/exportarReportePdf'
 import type { ReporteDesempenoTutorResponse } from '../../types'
 
 type SortKey = keyof Pick<
@@ -25,9 +26,12 @@ const columnas: { key: SortKey; label: string; align?: string }[] = [
 ]
 
 export default function ReporteDesempenoTutores() {
+    const fechaInicioRef = useRef<HTMLInputElement>(null)
+    const fechaFinRef = useRef<HTMLInputElement>(null)
     const [reportes, setReportes] = useState<ReporteDesempenoTutorResponse[]>([])
     const [fechaInicio, setFechaInicio] = useState('')
     const [fechaFin, setFechaFin] = useState('')
+    const [filtrosAplicados, setFiltrosAplicados] = useState({ fechaInicio: '', fechaFin: '' })
     const [cargando, setCargando] = useState(false)
     const [error, setError] = useState('')
     const [sortKey, setSortKey] = useState<SortKey>('nombreTutor')
@@ -43,6 +47,7 @@ export default function ReporteDesempenoTutores() {
             }
             const data = await reportesApi.getDesempenoTutores(params)
             setReportes(data)
+            setFiltrosAplicados({ fechaInicio: inicio, fechaFin: fin })
         } catch (e: unknown) {
             const mensaje = isAxiosError<{ message?: string }>(e)
                 ? e.response?.data?.message
@@ -99,30 +104,53 @@ export default function ReporteDesempenoTutores() {
         return `${new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 }).format(valor)}${sufijo}`
     }
 
-    const exportarCsv = () => {
-        const encabezados = ['Tutor', 'Total sesiones', 'Completadas', 'Canceladas', '% cancelación', 'Promedio calificación']
-        const filas = datosOrdenados.map((reporte) => [
-            reporte.nombreTutor,
-            reporte.totalSesiones,
-            reporte.sesionesCompletadas ?? 'Sin datos',
-            reporte.sesionesCanceladas,
-            reporte.porcentajeCancelacion,
-            reporte.promedioCalificacion ?? 'Sin datos',
-        ])
+    const formatoFecha = (valor: string) => {
+        if (!valor) return ''
+        const [anio, mes, dia] = valor.split('-')
+        return `${dia}/${mes}/${anio}`
+    }
 
-        const contenido = [encabezados, ...filas]
-            .map((fila) => fila.map((valor) => `"${String(valor).replace(/"/g, '""')}"`).join(','))
-            .join('\n')
+    const abrirSelectorFecha = (input: HTMLInputElement | null) => {
+        input?.focus()
+        try {
+            input?.showPicker?.()
+        } catch {
+            return
+        }
+    }
 
-        const blob = new Blob([contenido], { type: 'text/csv;charset=utf-8;' })
-        const url = URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.setAttribute('download', 'reporte-desempeno-tutores.csv')
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        URL.revokeObjectURL(url)
+    const fechaNombreArchivo = () => new Intl.DateTimeFormat('sv-SE', {
+        timeZone: 'America/Bogota',
+    }).format(new Date())
+
+    const exportarPdf = async () => {
+        const periodo = filtrosAplicados.fechaInicio || filtrosAplicados.fechaFin
+            ? `Periodo: ${formatoFecha(filtrosAplicados.fechaInicio) || 'Sin fecha inicio'} - ${formatoFecha(filtrosAplicados.fechaFin) || 'Sin fecha fin'}`
+            : 'Periodo: Todos los periodos'
+
+        try {
+            setError('')
+            await exportarReportePdf({
+                title: 'Reporte de desempeño de tutores',
+                subtitle: 'Sesiones, cancelaciones y promedio de calificación',
+                fileName: `Reporte de Desempeño de Tutores - ${fechaNombreArchivo()}.pdf`,
+                metadata: [periodo],
+                columns: columnas.map((columna) => ({
+                    header: columna.label,
+                    align: columna.align === 'text-right' ? 'right' : 'left',
+                })),
+                rows: datosOrdenados.map((reporte) => [
+                    reporte.nombreTutor,
+                    formatoNumero(reporte.totalSesiones),
+                    formatoNumero(reporte.sesionesCompletadas),
+                    formatoNumero(reporte.sesionesCanceladas),
+                    formatoNumero(reporte.porcentajeCancelacion, '%'),
+                    formatoNumero(reporte.promedioCalificacion),
+                ]),
+            })
+        } catch {
+            setError('No se pudo exportar el PDF.')
+        }
     }
 
     return (
@@ -133,25 +161,25 @@ export default function ReporteDesempenoTutores() {
                         <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Desempeño de Tutores</h1>
                         <p className="text-slate-500 mt-2">Consulta sesiones, cancelaciones y métricas disponibles por tutor activo.</p>
                     </div>
-                    <Button onClick={exportarCsv} disabled={datosOrdenados.length === 0} className="flex items-center gap-2 self-start lg:self-auto">
-                        <Download className="w-4 h-4" /> Exportar CSV
-                    </Button>
                 </div>
 
                 <Card className="shadow-sm">
                     <CardContent className="pt-6">
-                        <div className="grid grid-cols-1 md:grid-cols-[1fr_1fr_auto] gap-4 items-end">
-                            <div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-[1fr_1fr_auto_auto] gap-4 items-end">
+                            <div onClick={() => abrirSelectorFecha(fechaInicioRef.current)} className="cursor-pointer">
                                 <label className="text-sm font-medium mb-1 block text-slate-700 dark:text-slate-300">Fecha inicio</label>
-                                <Input type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} />
+                                <Input ref={fechaInicioRef} type="date" value={fechaInicio} onChange={(e) => setFechaInicio(e.target.value)} className="cursor-pointer" />
                             </div>
-                            <div>
+                            <div onClick={() => abrirSelectorFecha(fechaFinRef.current)} className="cursor-pointer">
                                 <label className="text-sm font-medium mb-1 block text-slate-700 dark:text-slate-300">Fecha fin</label>
-                                <Input type="date" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} />
+                                <Input ref={fechaFinRef} type="date" value={fechaFin} onChange={(e) => setFechaFin(e.target.value)} className="cursor-pointer" />
                             </div>
                             <Button onClick={() => cargarReporte(fechaInicio, fechaFin)} disabled={cargando} className="flex items-center gap-2">
                                 {cargando ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                                 Aplicar filtros
+                            </Button>
+                            <Button onClick={exportarPdf} disabled={cargando || datosOrdenados.length === 0} className="flex items-center gap-2">
+                                <Download className="w-4 h-4" /> Exportar PDF
                             </Button>
                         </div>
                     </CardContent>
