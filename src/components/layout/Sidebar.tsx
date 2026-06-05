@@ -39,6 +39,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     { type: 'link', name: 'Dashboard', path: '/admin', icon: <LayoutDashboard className="w-5 h-5" /> },
                     { type: 'link', name: 'Tutores', path: '/admin/tutores', icon: <Users className="w-5 h-5" /> },
                     { type: 'link', name: 'Materias', path: '/admin/materias', icon: <BookOpen className="w-5 h-5" /> },
+                    {type: 'link',name: 'Auditoría',path: '/admin/auditoria',icon: <Activity className="w-5 h-5" />},
                     {
                         type: 'section',
                         name: 'Reportes',

@@ -95,3 +95,18 @@ export interface PageResponse<T> {
     totalElements: number
     number: number
 }
+
+export interface AuditoriaSesionResponse {
+
+    sesionId: number
+
+    tutor: string
+
+    estudiante: string
+
+    estadoAnterior: string
+
+    estadoNuevo: string
+
+    fechaCambio: string
+}

@@ -22,6 +22,7 @@ import AdminDashboard from '../pages/admin/AdminDashboard'
 import GestionTutores from '../pages/admin/GestionTutores'
 import GestionMaterias from '../pages/admin/GestionMaterias'
 import ReporteDesempenoTutores from '../pages/admin/ReporteDesempenoTutores'
+import AuditoriaSesionesPage from '../pages/admin/AuditoriaSesionesPage'
 
 // Shared Flow
 import ChatPage from '../pages/chat/ChatPage'
@@ -67,6 +68,7 @@ const AppRouter = () => {
                 <Route path="/admin/tutores" element={<GestionTutores />} />
                 <Route path="/admin/materias" element={<GestionMaterias />} />
                 <Route path="/admin/reportes/tutores" element={<ReporteDesempenoTutores />} />
+                <Route path="/admin/auditoria" element={<AuditoriaSesionesPage />} />
             </Route>
 
             {/* SHARED PROTECTED ROUTES */}
