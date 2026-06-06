@@ -15,6 +15,7 @@ import SesionesEstudiante from '../pages/estudiante/SesionesEstudiante'
 import TutorDashboard from '../pages/tutor/TutorDashboard'
 import DisponibilidadPage from '../pages/tutor/DisponibilidadPage'
 import SesionesTutor from '../pages/tutor/SesionesTutor'
+import EvaluacionesTutor from '../pages/tutor/EvaluacionesTutor'
 import MisMateriasPage from '../pages/tutor/MisMateriasPage'
 
 // Admin Pages
@@ -56,6 +57,7 @@ const AppRouter = () => {
                 <Route path="/tutor" element={<TutorDashboard />} />
                 <Route path="/tutor/disponibilidad" element={<DisponibilidadPage />} />
                 <Route path="/tutor/sesiones" element={<SesionesTutor />} />
+                <Route path="/tutor/evaluaciones" element={<EvaluacionesTutor />} />
                 <Route path="/tutor/chat" element={<ChatPage />} />
                 <Route path="/tutor/materias" element={<MisMateriasPage />} />
             </Route>
