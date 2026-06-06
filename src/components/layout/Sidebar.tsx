@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock } from 'lucide-react'
+import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock, Star } from 'lucide-react'
 import { useAuthStore } from '../../store/authStore'
 
 interface SidebarProps {
@@ -26,6 +26,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     { name: 'Dashboard', path: '/tutor', icon: <LayoutDashboard className="w-5 h-5" /> },
                     { name: 'Disponibilidad', path: '/tutor/disponibilidad', icon: <Clock className="w-5 h-5" /> },
                     { name: 'Sesiones', path: '/tutor/sesiones', icon: <Calendar className="w-5 h-5" /> },
+                    { name: 'Evaluar estudiante', path: '/tutor/evaluaciones', icon: <Star className="w-5 h-5" /> },
                     { name: 'Chat', path: '/tutor/chat', icon: <MessageSquare className="w-5 h-5" /> },
                     { name: 'Mis Materias', path: '/tutor/materias', icon: <BookOpen className="w-5 h-5" /> },
                 ]
