@@ -1,0 +1,30 @@
+name: CI Frontend
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout del código
+        uses: actions/checkout@v4
+
+      - name: Instalar Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Limpiar caché npm
+        run: npm cache clean --force
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Build de producción
+        run: npm run build
