@@ -12,6 +12,7 @@ interface ChatMessagesProps {
 export function ChatMessages({ mensajes, usuarioId, cargando }: ChatMessagesProps) {
     const bottomRef = useRef<HTMLDivElement>(null)
 
+    // Scroll automático al último mensaje cada vez que llegan nuevos
     useEffect(() => {
         if (bottomRef.current) {
             bottomRef.current.scrollIntoView({ behavior: 'smooth' })
@@ -40,7 +41,8 @@ export function ChatMessages({ mensajes, usuarioId, cargando }: ChatMessagesProp
     return (
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-slate-50/30 dark:bg-slate-950/30">
             {mensajes.map((m, index) => {
-                // MNT-05 — mensaje del sistema
+
+                // MNT-05 — mensajes del sistema se renderizan con componente separado
                 if (m.esSistema) {
                     return (
                         <div key={m.id}>
@@ -51,6 +53,7 @@ export function ChatMessages({ mensajes, usuarioId, cargando }: ChatMessagesProp
 
                 const esMio = m.emisorId === usuarioId
                 const mensajeAnterior = index > 0 ? mensajes[index - 1] : null
+                // Muestra el nombre solo cuando cambia de remitente
                 const mostrarNombre = !esMio && (!mensajeAnterior || mensajeAnterior.emisorId !== m.emisorId)
 
                 return (
