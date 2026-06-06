@@ -1,11 +1,9 @@
-
-
-// Props del componente de mensaje automático del sistema (MNT-05)
+// Props del componente de mensaje automatico del sistema (MNT-05)
 interface MensajeSistemaProps {
     contenido: string
 }
 
-// Renderiza mensajes automáticos centrados, en gris y cursiva
+// Renderiza mensajes automaticos centrados, en gris y cursiva
 // Se muestra cuando esSistema = true en ChatMessages
 export function MensajeSistema({ contenido }: MensajeSistemaProps) {
     return (
