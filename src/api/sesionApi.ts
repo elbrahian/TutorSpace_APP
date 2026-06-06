@@ -1,5 +1,5 @@
 import axiosInstance from './axiosInstance'
-import type { DisponibilidadResponse, SesionResponse, EstadoSesion } from '../types'
+import type { DisponibilidadResponse, SesionResponse, EstadoSesion, EvaluacionEstudianteRequest, EvaluacionEstudianteResponse } from '../types'
 
 export const sesionApi = {
     getDisponibilidadTutor: async (): Promise<DisponibilidadResponse[]> => {
@@ -30,6 +30,11 @@ export const sesionApi = {
 
     cambiarEstado: async (id: number, nuevoEstado: EstadoSesion): Promise<SesionResponse> => {
         const response = await axiosInstance.patch(`/sesiones/${id}/estado`, { nuevoEstado })
+        return response.data
+    },
+
+    evaluarEstudiante: async (id: number, data: EvaluacionEstudianteRequest): Promise<EvaluacionEstudianteResponse> => {
+        const response = await axiosInstance.post(`/sesiones/${id}/evaluacion-estudiante`, data)
         return response.data
     }
 }
