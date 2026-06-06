@@ -71,10 +71,11 @@ export interface EvaluacionEstudianteResponse {
 
 export interface MensajeResponse {
     id: number
-    emisorId: number
+    emisorId: number | null
     nombreEmisor: string
     contenido: string
     fecha: string
+    esSistema: boolean
 }
 
 export interface ChatResponse {
@@ -125,3 +126,4 @@ export interface AuditoriaSesionResponse {
 
     fechaCambio: string
 }
+

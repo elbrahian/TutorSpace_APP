@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { MensajeResponse } from '../../types'
 import { Loader2, MessageSquareDashed } from 'lucide-react'
+import { MensajeSistema } from './MensajeSistema'
 
 interface ChatMessagesProps {
     mensajes: MensajeResponse[]
@@ -11,7 +12,6 @@ interface ChatMessagesProps {
 export function ChatMessages({ mensajes, usuarioId, cargando }: ChatMessagesProps) {
     const bottomRef = useRef<HTMLDivElement>(null)
 
-    // Scroll al último mensaje siempre que cambian
     useEffect(() => {
         if (bottomRef.current) {
             bottomRef.current.scrollIntoView({ behavior: 'smooth' })
@@ -37,10 +37,18 @@ export function ChatMessages({ mensajes, usuarioId, cargando }: ChatMessagesProp
         )
     }
 
-    // Identificar si debemos mostrar el nombre del emisor (si los mensajes seguidos son de la misma persona)
     return (
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-slate-50/30 dark:bg-slate-950/30">
             {mensajes.map((m, index) => {
+                // MNT-05 — mensaje del sistema
+                if (m.esSistema) {
+                    return (
+                        <div key={m.id}>
+                            <MensajeSistema contenido={m.contenido} />
+                        </div>
+                    )
+                }
+
                 const esMio = m.emisorId === usuarioId
                 const mensajeAnterior = index > 0 ? mensajes[index - 1] : null
                 const mostrarNombre = !esMio && (!mensajeAnterior || mensajeAnterior.emisorId !== m.emisorId)
