@@ -52,6 +52,24 @@ export interface SesionResponse {
     horaFin: string
     estado: EstadoSesion
     createdAt: string
+    calificada: boolean
+}
+
+// MNT-12 — Evaluación de la sesión por el estudiante
+export interface CalificacionSesionRequest {
+    calificacion: number
+    comentario?: string
+}
+
+export interface CalificacionSesionResponse {
+    calificacionId: number
+    sesionId: number
+    nombreTutor: string
+    calificacion: number
+    comentario?: string
+    fecha: string
+    horaInicio: string
+    mensaje: string
 }
 
 export interface EvaluacionEstudianteRequest {
