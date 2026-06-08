@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { DashboardLayout } from '../../components/layout/DashboardLayout'
 import { sesionApi } from '../../api/sesionApi'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog'
@@ -17,17 +17,22 @@ export default function SesionesEstudiante() {
     const [selectedSesion, setSelectedSesion] = useState<SesionResponse | null>(null)
     const [evaluando, setEvaluando] = useState(false)
 
-    useEffect(() => {
-        const fetchSesiones = async () => {
-            try {
-                const data = await sesionApi.getSesionesEstudiante()
-                setSesiones(data)
-            } catch (e) {
-                console.error(e)
-            }
+    const fetchSesiones = useCallback(async () => {
+        try {
+            const data = await sesionApi.getSesionesEstudiante()
+            setSesiones(data)
+        } catch (e) {
+            console.error(e)
         }
-        fetchSesiones()
     }, [])
+
+    // Carga inicial + auto-refresco cada 60s. Así, cuando el scheduler del backend
+    // marca una sesión como COMPLETADA, el calendario lo refleja sin recargar.
+    useEffect(() => {
+        fetchSesiones()
+        const intervalo = setInterval(fetchSesiones, 60_000)
+        return () => clearInterval(intervalo)
+    }, [fetchSesiones])
 
     const eventos = sesiones.map((s) => {
         const estado = s.estado.toUpperCase()
