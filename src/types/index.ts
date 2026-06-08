@@ -125,3 +125,29 @@ export interface AuditoriaSesionResponse {
 
     fechaCambio: string
 }
+
+// MNT-11 - Reporte de Uso de la Plataforma por Rol
+export interface UsoPorRolResponse {
+    rol: Rol
+    usuariosActivos: number
+    sesiones: number
+    mensajesEnviados: number
+}
+
+export interface ActividadSemanalResponse {
+    semana: string
+    inicioSemana: string
+    estudiante: number
+    tutor: number
+    admin: number
+}
+
+export interface ReporteUsoResponse {
+    estudiantesActivos: number
+    tutoresActivos: number
+    adminsActivos: number
+    totalSesionesCreadas: number
+    totalMensajesEnviados: number
+    metricasPorRol: UsoPorRolResponse[]
+    actividadSemanal: ActividadSemanalResponse[]
+}
