@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock, BarChart3, Activity, ChevronDown, TrendingUp } from 'lucide-react'
+import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock, BarChart3, Activity, ChevronDown, TrendingUp, Star } from 'lucide-react'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { useAuthStore } from '../../store/authStore'
@@ -39,7 +39,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     { type: 'link', name: 'Dashboard', path: '/admin', icon: <LayoutDashboard className="w-5 h-5" /> },
                     { type: 'link', name: 'Tutores', path: '/admin/tutores', icon: <Users className="w-5 h-5" /> },
                     { type: 'link', name: 'Materias', path: '/admin/materias', icon: <BookOpen className="w-5 h-5" /> },
-                    {type: 'link',name: 'Auditoría',path: '/admin/auditoria',icon: <Activity className="w-5 h-5" />},
+                    { type: 'link', name: 'Auditoría', path: '/admin/auditoria', icon: <Activity className="w-5 h-5" /> },
                     {
                         type: 'section',
                         name: 'Reportes',
@@ -55,6 +55,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     { type: 'link', name: 'Dashboard', path: '/tutor', icon: <LayoutDashboard className="w-5 h-5" /> },
                     { type: 'link', name: 'Disponibilidad', path: '/tutor/disponibilidad', icon: <Clock className="w-5 h-5" /> },
                     { type: 'link', name: 'Sesiones', path: '/tutor/sesiones', icon: <Calendar className="w-5 h-5" /> },
+                    { type: 'link', name: 'Evaluar estudiante', path: '/tutor/evaluaciones', icon: <Star className="w-5 h-5" /> },
                     { type: 'link', name: 'Chat', path: '/tutor/chat', icon: <MessageSquare className="w-5 h-5" /> },
                     { type: 'link', name: 'Mis Materias', path: '/tutor/materias', icon: <BookOpen className="w-5 h-5" /> },
                 ]
