@@ -1,5 +1,5 @@
 export type Rol = 'ESTUDIANTE' | 'TUTOR' | 'ADMIN'
-export type EstadoSesion = 'PENDIENTE' | 'APROBADA' | 'CANCELADA'
+export type EstadoSesion = 'PENDIENTE' | 'APROBADA' | 'CANCELADA' | 'COMPLETADA'
 export type EstadoDisponibilidad = 'DISPONIBLE' | 'BLOQUEADA'
 export type TipoNotificacion = 'NUEVO_MENSAJE' | 'SESION_CREADA' | 'CAMBIO_ESTADO'
 
@@ -52,6 +52,21 @@ export interface SesionResponse {
     horaFin: string
     estado: EstadoSesion
     createdAt: string
+}
+
+export interface EvaluacionEstudianteRequest {
+    puntuacion: number
+    observaciones?: string
+}
+
+export interface EvaluacionEstudianteResponse {
+    id: number
+    sesionId: number
+    estudianteId: number
+    tutorId: number
+    puntuacion: number
+    observaciones?: string
+    creadoEn: string
 }
 
 export interface MensajeResponse {
