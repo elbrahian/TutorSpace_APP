@@ -110,3 +110,16 @@ export interface AuditoriaSesionResponse {
 
     fechaCambio: string
 }
+
+export interface MateriaDemandaResponse {
+    materia: string
+    sesionesSolicitadas: number
+    tutoresDisponibles: number
+    tasaCobertura: number | null
+}
+
+export interface ReporteDemandaResponse {
+    materias: MateriaDemandaResponse[]
+    top5MayorDemanda: MateriaDemandaResponse[]
+    top5MenorDemanda: MateriaDemandaResponse[]
+}

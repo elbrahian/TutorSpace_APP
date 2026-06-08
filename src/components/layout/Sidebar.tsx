@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock, BarChart3, Activity, ChevronDown } from 'lucide-react'
+import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock, BarChart3, Activity, ChevronDown, TrendingUp } from 'lucide-react'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { useAuthStore } from '../../store/authStore'
@@ -46,6 +46,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                         icon: <BarChart3 className="w-5 h-5" />,
                         children: [
                             { type: 'link', name: 'Desempeño', path: '/admin/reportes/tutores', icon: <Activity className="w-4 h-4" /> },
+                            { type: 'link', name: 'Oferta y Demanda', path: '/admin/reportes/demanda', icon: <TrendingUp className="w-4 h-4" /> },
                         ],
                     },
                 ]
@@ -86,9 +87,9 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 to={link.path}
                 onClick={onClose}
                 className={`flex items-center gap-3 rounded-lg transition-colors ${nested ? 'ml-8 px-3 py-2 text-sm' : 'px-3 py-2.5'} ${isActive
-                        ? 'bg-primary text-primary-foreground font-medium'
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                    }`}
+                    ? 'bg-primary text-primary-foreground font-medium'
+                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
             >
                 {link.icon}
                 {link.name}
@@ -125,9 +126,9 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                                 type="button"
                                 onClick={() => toggleSection(item.name)}
                                 className={`flex w-full items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium ${isActive
-                                        ? 'text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800'
-                                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
-                                    }`}
+                                    ? 'text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800'
+                                    : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                                }`}
                             >
                                 {item.icon}
                                 <span>{item.name}</span>
