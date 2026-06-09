@@ -46,6 +46,9 @@ const AuditoriaSesionesPage = () => {
 
     const [auditorias, setAuditorias] = useState<AuditoriaSesionResponse[]>([])
     const [loading, setLoading] = useState(false)
+    const [paginaActual, setPaginaActual] = useState(1)
+
+    const registrosPorPagina = 10
 
     const fetchAuditorias = async (filtros?: {
         estadoAnterior?: string
@@ -92,53 +95,73 @@ const AuditoriaSesionesPage = () => {
 
     const buscar = () => {
 
-        fetchAuditorias({
-            estadoAnterior,
-            estadoNuevo,
-            tutor,
-            estudiante
-        })
-    }
+    setPaginaActual(1)
+
+    fetchAuditorias({
+        estadoAnterior,
+        estadoNuevo,
+        tutor,
+        estudiante
+    })
+}
 
     const limpiar = () => {
 
-        setEstadoAnterior('')
-        setEstadoNuevo('')
-        setTutor('')
-        setEstudiante('')
+    setEstadoAnterior('')
+    setEstadoNuevo('')
+    setTutor('')
+    setEstudiante('')
 
-        setFechaInicio('')
-        setFechaFin('')
+    setFechaInicio('')
+    setFechaFin('')
 
-        fetchAuditorias()
+    setPaginaActual(1)
+
+    fetchAuditorias()
     }
 
     const auditoriasFiltradas = auditorias.filter(item => {
 
-        const fechaRegistro = new Date(item.fechaCambio)
+    const fechaRegistro = new Date(item.fechaCambio)
 
-        if (fechaInicio) {
+    if (fechaInicio) {
 
-            const inicio = new Date(fechaInicio)
-            inicio.setHours(0, 0, 0, 0)
+        const inicio = new Date(fechaInicio)
+        inicio.setHours(0, 0, 0, 0)
 
-            if (fechaRegistro < inicio) {
-                return false
-            }
+        if (fechaRegistro < inicio) {
+            return false
         }
+    }
 
-        if (fechaFin) {
+    if (fechaFin) {
 
-            const fin = new Date(fechaFin)
-            fin.setHours(23, 59, 59, 999)
+        const fin = new Date(fechaFin)
+        fin.setHours(23, 59, 59, 999)
 
-            if (fechaRegistro > fin) {
-                return false
-            }
+        if (fechaRegistro > fin) {
+            return false
         }
+    }
 
-        return true
-    })
+    return true
+})
+
+const totalPaginas = Math.ceil(
+    auditoriasFiltradas.length / registrosPorPagina
+)
+
+const indiceInicial =
+    (paginaActual - 1) * registrosPorPagina
+
+const indiceFinal =
+    indiceInicial + registrosPorPagina
+
+const auditoriasPaginadas =
+    auditoriasFiltradas.slice(
+        indiceInicial,
+        indiceFinal
+    )
 
     const exportarPdf = async () => {
 
@@ -407,7 +430,7 @@ const AuditoriaSesionesPage = () => {
 
                                     ) : (
 
-                                        auditoriasFiltradas.map(item => (
+                                        auditoriasPaginadas.map(item => (
 
                                             <tr
                                                 key={item.sesionId + item.fechaCambio}
@@ -448,7 +471,81 @@ const AuditoriaSesionesPage = () => {
 
                             </table>
 
-                        </div>
+<div className="flex items-center justify-between px-4 py-4 border-t">
+
+    <span className="text-sm text-muted-foreground">
+
+        Mostrando
+
+        {' '}
+
+        {auditoriasFiltradas.length === 0
+            ? 0
+            : indiceInicial + 1}
+
+        -
+
+        {Math.min(
+            indiceFinal,
+            auditoriasFiltradas.length
+        )}
+
+        {' '}de{' '}
+
+        {auditoriasFiltradas.length}
+
+        registros
+
+    </span>
+
+    <div className="flex items-center gap-2">
+
+        <Button
+            variant="outline"
+            disabled={paginaActual === 1}
+            onClick={() =>
+                setPaginaActual(
+                    paginaActual - 1
+                )
+            }
+        >
+            Anterior
+        </Button>
+
+        <span className="text-sm px-2">
+
+            Página
+
+            {' '}
+
+            {paginaActual}
+
+            {' '}de{' '}
+
+            {totalPaginas || 1}
+
+        </span>
+
+        <Button
+            variant="outline"
+            disabled={
+                paginaActual === totalPaginas ||
+                totalPaginas === 0
+            }
+            onClick={() =>
+                setPaginaActual(
+                    paginaActual + 1
+                )
+            }
+        >
+            Siguiente
+        </Button>
+
+    </div>
+
+</div>
+
+</div>
 
                     </CardContent>
 
