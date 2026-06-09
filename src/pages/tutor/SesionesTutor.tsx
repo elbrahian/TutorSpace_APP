@@ -7,11 +7,19 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { Button } from '../../components/ui/button'
+import { formatDate } from '../../utils/formatDate'
 
 export default function SesionesTutor() {
     const [sesiones, setSesiones] = useState<SesionResponse[]>([])
     const [selectedSesion, setSelectedSesion] = useState<SesionResponse | null>(null)
     const [loading, setLoading] = useState(false)
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 640)
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
     useEffect(() => {
         cargarSesiones()
@@ -90,20 +98,22 @@ export default function SesionesTutor() {
                         </div>
                     </div>
 
-                    <div className="calendar-container overflow-x-auto">
+                    <div className="calendar-container">
                         <FullCalendar
                             plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                            initialView={window.innerWidth < 768 ? 'dayGridMonth' : 'dayGridMonth'}
+                            initialView="dayGridMonth"
                             headerToolbar={{
-                                left: 'prev,next today',
+                                left: 'prev,next',
                                 center: 'title',
-                                right: window.innerWidth < 768 ? '' : 'dayGridMonth,timeGridWeek'
+                                right: isMobile ? 'today' : 'today dayGridMonth,timeGridWeek'
                             }}
+                            buttonText={{ today: 'Hoy', month: 'Mes', week: 'Semana' }}
                             events={eventos}
                             eventClick={handleEventClick}
-                            height="auto"
-                            contentHeight="600px"
+                            height={isMobile ? 'auto' : '600px'}
                             locale="es"
+                            dayMaxEvents={isMobile ? 2 : 3}
+                            moreLinkText={(n) => `+${n} más`}
                         />
                     </div>
 
@@ -129,7 +139,7 @@ export default function SesionesTutor() {
                                         </div>
                                         <div>
                                             <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Fecha</p>
-                                            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{selectedSesion.fecha}</p>
+                                            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">{formatDate(selectedSesion.fecha)}</p>
                                         </div>
                                     </div>
 
@@ -159,7 +169,7 @@ export default function SesionesTutor() {
                                     </div>
                                 </div>
 
-                                <div className="flex gap-3 justify-end pt-4 border-t border-slate-100 mt-6">
+                                <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3 sm:justify-end pt-4 border-t border-slate-100 mt-6">
                                     <Button variant="outline" onClick={() => setSelectedSesion(null)}>
                                         Cerrar
                                     </Button>
