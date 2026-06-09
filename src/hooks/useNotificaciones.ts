@@ -6,23 +6,35 @@
  * al topic de notificaciones del usuario actual.
  */
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { notificacionApi } from '../api/notificacionApi'
 import { useNotificacionStore } from '../store/notificacionStore'
 import { useAuthStore } from '../store/authStore'
 import { stompSubscribe, stompUnsubscribe } from './useStompClient'
 import type { Notificacion } from '../types'
 
+const parsearError = (error: any, accion: string): string => {
+    const serverMsg = error?.response?.data?.message
+    if (serverMsg) return serverMsg
+    const status = error?.response?.status
+    if (status === 401) return 'Tu sesión expiró. Vuelve a iniciar sesión.'
+    if (status >= 500) return 'Error en el servidor. Intenta de nuevo en unos momentos.'
+    if (!navigator.onLine) return 'Sin conexión a internet. Verifica tu red.'
+    return `No se pudo ${accion}. Intenta de nuevo.`
+}
+
 export const useNotificaciones = () => {
     const { token, usuario } = useAuthStore()
-    const { 
-        notificaciones, 
-        noLeidas, 
-        setTodas, 
-        agregar, 
+    const {
+        notificaciones,
+        noLeidas,
+        setTodas,
+        agregar,
         marcarLeida: marcarStoreLeida,
         marcarTodasLeidas: marcarStoreTodasLeidas
     } = useNotificacionStore()
+
+    const [error, setError] = useState<string | null>(null)
 
     // Cargar notificaciones históricas desde la API
     useEffect(() => {
@@ -30,10 +42,12 @@ export const useNotificaciones = () => {
 
         const cargar = async () => {
             try {
+                setError(null)
                 const data = await notificacionApi.getNotificaciones()
                 setTodas(data)
-            } catch (error) {
-                console.error('Error al cargar notificaciones:', error)
+            } catch (err) {
+                console.error('Error al cargar notificaciones:', err)
+                setError(parsearError(err, 'cargar tus notificaciones'))
             }
         }
         cargar()
@@ -63,8 +77,9 @@ export const useNotificaciones = () => {
         marcarStoreLeida(id)
         try {
             await notificacionApi.marcarLeida(id)
-        } catch (error) {
-            console.error('Error al marcar como leída:', error)
+        } catch (err) {
+            console.error('Error al marcar como leída:', err)
+            setError(parsearError(err, 'marcar la notificación como leída'))
         }
     }
 
@@ -75,14 +90,17 @@ export const useNotificaciones = () => {
         marcarStoreTodasLeidas()
         try {
             await Promise.all(noLeidasList.map(n => notificacionApi.marcarLeida(n.id)))
-        } catch (error) {
-            console.error('Error al marcar todas como leídas:', error)
+        } catch (err) {
+            console.error('Error al marcar todas como leídas:', err)
+            setError(parsearError(err, 'marcar todas las notificaciones como leídas'))
         }
     }
 
     return {
         notificaciones,
         noLeidas,
+        error,
+        clearError: () => setError(null),
         marcarLeida,
         marcarTodasLeidas
     }
