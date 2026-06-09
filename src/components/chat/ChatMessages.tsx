@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { MensajeResponse } from '../../types'
-import { Loader2, MessageSquareDashed } from 'lucide-react'
+import { MessageSquareDashed } from 'lucide-react'
+import { ChatBubbleSkeleton } from '../ui/skeleton'
 
 interface ChatMessagesProps {
     mensajes: MensajeResponse[]
@@ -19,12 +20,7 @@ export function ChatMessages({ mensajes, usuarioId, cargando }: ChatMessagesProp
     }, [mensajes])
 
     if (cargando) {
-        return (
-            <div className="flex-1 flex flex-col items-center justify-center text-slate-500">
-                <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
-                <p>Cargando mensajes...</p>
-            </div>
-        )
+        return <ChatBubbleSkeleton />
     }
 
     if (mensajes.length === 0) {
