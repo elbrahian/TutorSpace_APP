@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom'
 import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock, BarChart3, Activity, ChevronDown, TrendingUp, Star } from 'lucide-react'
+import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock, BarChart3, Activity, ChevronDown, Star, PieChart } from 'lucide-react'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { useAuthStore } from '../../store/authStore'
@@ -47,6 +48,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                         children: [
                             { type: 'link', name: 'Desempeño', path: '/admin/reportes/tutores', icon: <Activity className="w-4 h-4" /> },
                             { type: 'link', name: 'Oferta y Demanda', path: '/admin/reportes/demanda', icon: <TrendingUp className="w-4 h-4" /> },
+                            { type: 'link', name: 'Uso por Rol', path: '/admin/reportes/uso', icon: <PieChart className="w-4 h-4" /> },
                         ],
                     },
                 ]

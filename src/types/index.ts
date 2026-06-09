@@ -52,6 +52,24 @@ export interface SesionResponse {
     horaFin: string
     estado: EstadoSesion
     createdAt: string
+    calificada: boolean
+}
+
+// MNT-12 — Evaluación de la sesión por el estudiante
+export interface CalificacionSesionRequest {
+    calificacion: number
+    comentario?: string
+}
+
+export interface CalificacionSesionResponse {
+    calificacionId: number
+    sesionId: number
+    nombreTutor: string
+    calificacion: number
+    comentario?: string
+    fecha: string
+    horaInicio: string
+    mensaje: string
 }
 
 export interface EvaluacionEstudianteRequest {
@@ -137,4 +155,28 @@ export interface ReporteDemandaResponse {
     materias: MateriaDemandaResponse[]
     top5MayorDemanda: MateriaDemandaResponse[]
     top5MenorDemanda: MateriaDemandaResponse[]
+// MNT-11 - Reporte de Uso de la Plataforma por Rol
+export interface UsoPorRolResponse {
+    rol: Rol
+    usuariosActivos: number
+    sesiones: number
+    mensajesEnviados: number
+}
+
+export interface ActividadSemanalResponse {
+    semana: string
+    inicioSemana: string
+    estudiante: number
+    tutor: number
+    admin: number
+}
+
+export interface ReporteUsoResponse {
+    estudiantesActivos: number
+    tutoresActivos: number
+    adminsActivos: number
+    totalSesionesCreadas: number
+    totalMensajesEnviados: number
+    metricasPorRol: UsoPorRolResponse[]
+    actividadSemanal: ActividadSemanalResponse[]
 }
