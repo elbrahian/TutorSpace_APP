@@ -155,6 +155,7 @@ export interface ReporteDemandaResponse {
     materias: MateriaDemandaResponse[]
     top5MayorDemanda: MateriaDemandaResponse[]
     top5MenorDemanda: MateriaDemandaResponse[]
+}
 // MNT-11 - Reporte de Uso de la Plataforma por Rol
 export interface UsoPorRolResponse {
     rol: Rol
