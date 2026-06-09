@@ -49,11 +49,12 @@ export function ChatInput({ onEnviar, deshabilitado }: ChatInputProps) {
                     className="flex-1 bg-transparent border-0 resize-none max-h-[120px] focus:ring-0 text-slate-900 dark:text-slate-100 text-sm py-2 px-3 placeholder:text-slate-400 disabled:opacity-50 scrollbar-thin outline-none"
                     rows={1}
                 />
-                <Button 
+                <Button
                     onClick={handleSend}
                     disabled={deshabilitado || !mensaje.trim()}
                     size="icon"
-                    className="rounded-full shadow-sm mb-0.5 shrink-0"
+                    aria-label="Enviar mensaje"
+                    className="rounded-full shadow-sm shrink-0 h-11 w-11"
                 >
                     <Send className="w-4 h-4" />
                 </Button>
