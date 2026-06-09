@@ -5,6 +5,7 @@ import { Button } from '../../components/ui/button'
 import { auditoriaApi } from '../../api/auditoriaApi'
 import type { AuditoriaSesionResponse } from '../../types'
 import { exportarReportePdf } from '../../utils/exportarReportePdf'
+import {Card,CardHeader,CardTitle,CardContent} from '../../components/ui/card'
 
 
 
@@ -93,26 +94,37 @@ const AuditoriaSesionesPage = () => {
     }
 
     return (
-        <DashboardLayout>
-            <div className="space-y-6">
+    <DashboardLayout>
+        <div className="space-y-6">
 
-                {/* Header */}
-                <div>
-                    <h1 className="text-3xl font-bold">Auditoría de Sesiones</h1>
-                    <p className="text-slate-400 mt-2">
-                        Consulta y exporta el historial de cambios de las sesiones.
-                    </p>
-                </div>
+            {/* Header */}
+            <div>
+                <h1 className="text-3xl font-bold">
+                    Auditoría de Sesiones
+                </h1>
 
-                {/* Filtros */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                    <h2 className="text-lg font-semibold mb-4">Filtros</h2>
+                <p className="text-muted-foreground mt-2">
+                    Consulta y exporta el historial de cambios de las sesiones.
+                </p>
+            </div>
+
+            {/* Filtros */}
+            <Card>
+
+                <CardHeader>
+                    <CardTitle>
+                        Filtros
+                    </CardTitle>
+                </CardHeader>
+
+                <CardContent>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
                         <select
                             value={estadoAnterior}
                             onChange={(e) => setEstadoAnterior(e.target.value)}
-                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+                            className="w-full rounded-lg border border-input bg-background px-3 py-2"
                         >
                             <option value="">Estado anterior</option>
                             <option value="PENDIENTE">Pendiente</option>
@@ -123,7 +135,7 @@ const AuditoriaSesionesPage = () => {
                         <select
                             value={estadoNuevo}
                             onChange={(e) => setEstadoNuevo(e.target.value)}
-                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+                            className="w-full rounded-lg border border-input bg-background px-3 py-2"
                         >
                             <option value="">Estado nuevo</option>
                             <option value="PENDIENTE">Pendiente</option>
@@ -135,89 +147,180 @@ const AuditoriaSesionesPage = () => {
                             value={tutor}
                             onChange={(e) => setTutor(e.target.value)}
                             placeholder="Tutor"
-                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+                            className="w-full rounded-lg border border-input bg-background px-3 py-2"
                         />
 
                         <input
                             value={estudiante}
                             onChange={(e) => setEstudiante(e.target.value)}
                             placeholder="Estudiante"
-                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
+                            className="w-full rounded-lg border border-input bg-background px-3 py-2"
                         />
+
                     </div>
 
-                    <div className="flex gap-3 mt-6">
-                        <Button onClick={buscar} className="flex items-center gap-2">
+                    <div className="flex flex-wrap gap-3 mt-6">
+
+                        <Button
+                            onClick={buscar}
+                            className="flex items-center gap-2"
+                        >
                             <Search size={18} />
                             Buscar
                         </Button>
 
-                        <Button onClick={limpiar} className="flex items-center gap-2">
+                        <Button
+                            variant="outline"
+                            onClick={limpiar}
+                            className="flex items-center gap-2"
+                        >
                             <RotateCcw size={18} />
                             Limpiar
                         </Button>
 
-                        <Button onClick={exportarPdf} className="flex items-center gap-2">
+                        <Button
+                            onClick={exportarPdf}
+                            className="flex items-center gap-2"
+                        >
                             <FileDown size={18} />
                             Exportar PDF
                         </Button>
-                    </div>
-                </div>
 
-                {/* Resultados */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-                    <div className="p-6 border-b border-slate-800">
-                        <h2 className="font-semibold">Historial de Sesiones</h2>
                     </div>
+
+                </CardContent>
+
+            </Card>
+
+            {/* Resultados */}
+            <Card>
+
+                <CardHeader>
+                    <CardTitle>
+                        Historial de Sesiones
+                    </CardTitle>
+                </CardHeader>
+
+                <CardContent className="p-0">
 
                     <div className="overflow-x-auto">
+
                         <table className="w-full">
-                            <thead className="bg-slate-950">
+
+                            <thead className="bg-muted">
+
                                 <tr>
-                                    <th className="px-4 py-3 text-left">Sesión</th>
-                                    <th className="px-4 py-3 text-left">Tutor</th>
-                                    <th className="px-4 py-3 text-left">Estudiante</th>
-                                    <th className="px-4 py-3 text-left">Estado Anterior</th>
-                                    <th className="px-4 py-3 text-left">Estado Nuevo</th>
-                                    <th className="px-4 py-3 text-left">Fecha</th>
+
+                                    <th className="px-4 py-3 text-left font-semibold">
+                                        Sesión
+                                    </th>
+
+                                    <th className="px-4 py-3 text-left font-semibold">
+                                        Tutor
+                                    </th>
+
+                                    <th className="px-4 py-3 text-left font-semibold">
+                                        Estudiante
+                                    </th>
+
+                                    <th className="px-4 py-3 text-left font-semibold">
+                                        Estado Anterior
+                                    </th>
+
+                                    <th className="px-4 py-3 text-left font-semibold">
+                                        Estado Nuevo
+                                    </th>
+
+                                    <th className="px-4 py-3 text-left font-semibold">
+                                        Fecha
+                                    </th>
+
                                 </tr>
+
                             </thead>
 
                             <tbody>
+
                                 {loading ? (
+
                                     <tr>
-                                        <td colSpan={6} className="px-4 py-6 text-center text-slate-400">
+
+                                        <td
+                                            colSpan={6}
+                                            className="px-4 py-8 text-center text-muted-foreground"
+                                        >
                                             Cargando...
                                         </td>
+
                                     </tr>
+
                                 ) : auditorias.length === 0 ? (
+
                                     <tr>
-                                        <td colSpan={6} className="px-4 py-6 text-center text-slate-400">
+
+                                        <td
+                                            colSpan={6}
+                                            className="px-4 py-8 text-center text-muted-foreground"
+                                        >
                                             No hay registros disponibles.
                                         </td>
-                                    </tr>
-                                ) : (
-                                    auditorias.map(item => (
-                                        <tr key={item.sesionId + item.fechaCambio} className="border-t border-slate-800">
-                                            <td className="px-4 py-3">{item.sesionId}</td>
-                                            <td className="px-4 py-3">{item.tutor}</td>
-                                            <td className="px-4 py-3">{item.estudiante}</td>
-                                            <td className="px-4 py-3">{estadoBadge(item.estadoAnterior)}</td>
-                                            <td className="px-4 py-3">{estadoBadge(item.estadoNuevo)}</td>
-                                            <td className="px-4 py-3">
-                                                {new Date(item.fechaCambio).toLocaleString()}
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
 
-            </div>
-        </DashboardLayout>
-    )
+                                    </tr>
+
+                                ) : (
+
+                                    auditorias.map(item => (
+
+                                        <tr
+                                            key={item.sesionId + item.fechaCambio}
+                                            className="border-t"
+                                        >
+
+                                            <td className="px-4 py-3">
+                                                {item.sesionId}
+                                            </td>
+
+                                            <td className="px-4 py-3">
+                                                {item.tutor}
+                                            </td>
+
+                                            <td className="px-4 py-3">
+                                                {item.estudiante}
+                                            </td>
+
+                                            <td className="px-4 py-3">
+                                                {estadoBadge(item.estadoAnterior)}
+                                            </td>
+
+                                            <td className="px-4 py-3">
+                                                {estadoBadge(item.estadoNuevo)}
+                                            </td>
+
+                                            <td className="px-4 py-3">
+                                                {new Date(
+                                                    item.fechaCambio
+                                                ).toLocaleString()}
+                                            </td>
+
+                                        </tr>
+
+                                    ))
+
+                                )}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </CardContent>
+
+            </Card>
+
+        </div>
+    </DashboardLayout>
+)
 }
 
 export default AuditoriaSesionesPage
