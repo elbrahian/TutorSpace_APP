@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock, BarChart3, Activity, ChevronDown, Star } from 'lucide-react'
+import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock, BarChart3, Activity, ChevronDown, Star, ClipboardCheck, GraduationCap } from 'lucide-react'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { useAuthStore } from '../../store/authStore'
@@ -38,6 +38,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 return [
                     { type: 'link', name: 'Dashboard', path: '/admin', icon: <LayoutDashboard className="w-5 h-5" /> },
                     { type: 'link', name: 'Tutores', path: '/admin/tutores', icon: <Users className="w-5 h-5" /> },
+                    { type: 'link', name: 'Solicitudes Tutor', path: '/admin/solicitudes-tutor', icon: <ClipboardCheck className="w-5 h-5" /> },
                     { type: 'link', name: 'Materias', path: '/admin/materias', icon: <BookOpen className="w-5 h-5" /> },
                     {type: 'link',name: 'Auditoría',path: '/admin/auditoria',icon: <Activity className="w-5 h-5" />},
                     {
@@ -62,6 +63,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 return [
                     { type: 'link', name: 'Dashboard', path: '/estudiante', icon: <LayoutDashboard className="w-5 h-5" /> },
                     { type: 'link', name: 'Buscar Tutores', path: '/estudiante/buscar', icon: <Users className="w-5 h-5" /> },
+                    { type: 'link', name: 'Solicitar ser Tutor', path: '/estudiante/solicitar-tutor', icon: <GraduationCap className="w-5 h-5" /> },
                     { type: 'link', name: 'Mis Sesiones', path: '/estudiante/sesiones', icon: <Calendar className="w-5 h-5" /> },
                     { type: 'link', name: 'Chat', path: '/estudiante/chat', icon: <MessageSquare className="w-5 h-5" /> },
                 ]
