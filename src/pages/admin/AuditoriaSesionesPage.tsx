@@ -206,57 +206,91 @@ const AuditoriaSesionesPage = () => {
 
                     <CardContent>
 
+
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+
+                            <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Estado Anterior
+                                    </label>
 
                             <select
                                 value={estadoAnterior}
                                 onChange={(e) => setEstadoAnterior(e.target.value)}
                                 className="w-full rounded-lg border border-input bg-background px-3 py-2"
                             >
-                                <option value="">Estado anterior</option>
+                                <option value="">Sin filtro</option>
                                 <option value="PENDIENTE">Pendiente</option>
                                 <option value="APROBADA">Aprobada</option>
                                 <option value="CANCELADA">Cancelada</option>
                             </select>
+                            </div>
 
+
+                            <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Estado Nuevo
+                                    </label>
                             <select
                                 value={estadoNuevo}
                                 onChange={(e) => setEstadoNuevo(e.target.value)}
                                 className="w-full rounded-lg border border-input bg-background px-3 py-2"
                             >
-                                <option value="">Estado nuevo</option>
+                                <option value="">Sin filtro</option>
                                 <option value="PENDIENTE">Pendiente</option>
                                 <option value="APROBADA">Aprobada</option>
                                 <option value="CANCELADA">Cancelada</option>
                             </select>
+                            </div>
 
+                            <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Tutor
+                                    </label>
                             <input
                                 value={tutor}
                                 onChange={(e) => setTutor(e.target.value)}
                                 placeholder="Tutor"
                                 className="w-full rounded-lg border border-input bg-background px-3 py-2"
                             />
+                            </div>
 
+                            <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Estudiante
+                                    </label>
                             <input
                                 value={estudiante}
                                 onChange={(e) => setEstudiante(e.target.value)}
                                 placeholder="Estudiante"
                                 className="w-full rounded-lg border border-input bg-background px-3 py-2"
                             />
+                            </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Fecha inicio
+                                    </label>
 
-                            <input
-                                type="date"
-                                value={fechaInicio}
-                                onChange={(e) => setFechaInicio(e.target.value)}
-                                className="w-full rounded-lg border border-input bg-background px-3 py-2"
-                            />
+                                    <input
+                                        type="date"
+                                        value={fechaInicio}
+                                        onChange={(e) => setFechaInicio(e.target.value)}
+                                        className="w-full rounded-lg border border-input bg-background px-3 py-2"
+                                    />
+                                </div>
 
-                            <input
-                                type="date"
-                                value={fechaFin}
-                                onChange={(e) => setFechaFin(e.target.value)}
-                                className="w-full rounded-lg border border-input bg-background px-3 py-2"
-                            />
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Fecha fin
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        value={fechaFin}
+                                        onChange={(e) => setFechaFin(e.target.value)}
+                                        className="w-full rounded-lg border border-input bg-background px-3 py-2"
+                                    />
+                                </div>
 
                         </div>
 
