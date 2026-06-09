@@ -24,6 +24,7 @@ import GestionTutores from '../pages/admin/GestionTutores'
 import GestionMaterias from '../pages/admin/GestionMaterias'
 import ReporteDesempenoTutores from '../pages/admin/ReporteDesempenoTutores'
 import ReporteUsoPorRol from '../pages/admin/ReporteUsoPorRol'
+import ReporteCalificacionTutores from '../pages/admin/ReporteCalificacionTutores'
 import AuditoriaSesionesPage from '../pages/admin/AuditoriaSesionesPage'
 
 // Shared Flow
@@ -72,6 +73,7 @@ const AppRouter = () => {
                 <Route path="/admin/materias" element={<GestionMaterias />} />
                 <Route path="/admin/reportes/tutores" element={<ReporteDesempenoTutores />} />
                 <Route path="/admin/reportes/uso" element={<ReporteUsoPorRol />} />
+                <Route path="/admin/reportes/calificaciones" element={<ReporteCalificacionTutores />} />
                 <Route path="/admin/auditoria" element={<AuditoriaSesionesPage />} />
             </Route>
 

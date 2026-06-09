@@ -47,6 +47,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                         children: [
                             { type: 'link', name: 'Desempeño', path: '/admin/reportes/tutores', icon: <Activity className="w-4 h-4" /> },
                             { type: 'link', name: 'Uso por Rol', path: '/admin/reportes/uso', icon: <PieChart className="w-4 h-4" /> },
+                            { type: 'link', name: 'Calificaciones', path: '/admin/reportes/calificaciones', icon: <Star className="w-4 h-4" /> },
                         ],
                     },
                 ]
