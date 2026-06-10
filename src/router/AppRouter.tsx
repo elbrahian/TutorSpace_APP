@@ -25,6 +25,7 @@ import AdminDashboard from '../pages/admin/AdminDashboard'
 import GestionTutores from '../pages/admin/GestionTutores'
 import GestionMaterias from '../pages/admin/GestionMaterias'
 import ReporteDesempenoTutores from '../pages/admin/ReporteDesempenoTutores'
+import ReporteDemandaTutores from '../pages/admin/ReporteDemandaTutores'
 import ReporteUsoPorRol from '../pages/admin/ReporteUsoPorRol'
 import ReporteCalificacionTutores from '../pages/admin/ReporteCalificacionTutores'
 import AuditoriaSesionesPage from '../pages/admin/AuditoriaSesionesPage'
@@ -77,6 +78,7 @@ const AppRouter = () => {
                 <Route path="/admin/tutores" element={<GestionTutores />} />
                 <Route path="/admin/materias" element={<GestionMaterias />} />
                 <Route path="/admin/reportes/tutores" element={<ReporteDesempenoTutores />} />
+                <Route path="/admin/reportes/demanda" element={<ReporteDemandaTutores />} />
                 <Route path="/admin/reportes/uso" element={<ReporteUsoPorRol />} />
                 <Route path="/admin/reportes/calificaciones" element={<ReporteCalificacionTutores />} />
                 <Route path="/admin/auditoria" element={<AuditoriaSesionesPage />} />
