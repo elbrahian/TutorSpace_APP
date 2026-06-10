@@ -194,7 +194,7 @@ const AuditoriaSesionesPage = () => {
                     { header: 'Fecha' }
                 ],
 
-                rows: response.content.map(item => [
+                rows: response.content.map((item: AuditoriaSesionResponse) => [
 
                     item.sesionId,
                     item.tutor,
