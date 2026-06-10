@@ -56,8 +56,9 @@ export const getMisSesionesConFiltros = async (filtros: SesionFiltros): Promise<
     params.append('page', String(filtros.page ?? 0));
     params.append('size', String(filtros.size ?? 10));
     params.append('sort', filtros.sort ?? 'fecha');
+    const queryString = params.toString().replace(/%2C/g, ',');
 
-    const response = await axiosInstance.get(`/sesiones?${params.toString()}`);
+    const response = await axiosInstance.get(`/sesiones?${queryString}`);
     return response.data;
 };
 
