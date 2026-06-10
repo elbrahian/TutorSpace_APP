@@ -62,6 +62,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     { type: 'link', name: 'Agendar Sesión', path: '/tutor/agendar', icon: <CalendarPlus className="w-5 h-5" /> },
                     { type: 'link', name: 'Chat', path: '/tutor/chat', icon: <MessageSquare className="w-5 h-5" /> },
                     { type: 'link', name: 'Mis Materias', path: '/tutor/materias', icon: <BookOpen className="w-5 h-5" /> },
+                    { type: 'link', name: 'Mis Tutorías', path: '/tutor/mis-tutorias', icon: <Calendar className="w-5 h-5" /> },
                 ]
             case 'ESTUDIANTE':
                 return [
