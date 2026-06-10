@@ -1,6 +1,5 @@
 import axiosInstance from './axiosInstance'
 import type { ReporteDesempenoTutorResponse, ReporteDemandaResponse, ReporteUsoResponse } from '../types'
-
 interface ReporteDesempenoTutoresParams {
     fechaInicio?: string
     fechaFin?: string
