@@ -17,6 +17,7 @@ import DisponibilidadPage from '../pages/tutor/DisponibilidadPage'
 import SesionesTutor from '../pages/tutor/SesionesTutor'
 import EvaluacionesTutor from '../pages/tutor/EvaluacionesTutor'
 import MisMateriasPage from '../pages/tutor/MisMateriasPage'
+import MisTutoriasPage from '../pages/tutor/MisTutoriasPage'
 
 // Admin Pages
 import AdminDashboard from '../pages/admin/AdminDashboard'
@@ -62,6 +63,7 @@ const AppRouter = () => {
                 <Route path="/tutor/evaluaciones" element={<EvaluacionesTutor />} />
                 <Route path="/tutor/chat" element={<ChatPage />} />
                 <Route path="/tutor/materias" element={<MisMateriasPage />} />
+                <Route path="/tutor/mis-tutorias" element={<MisTutoriasPage />} />
             </Route>
 
             {/* ADMIN ROUTES */}
