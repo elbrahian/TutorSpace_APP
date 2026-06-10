@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { MensajeResponse } from '../../types'
-import { MessageSquareDashed } from 'lucide-react'
-import { ChatBubbleSkeleton } from '../ui/skeleton'
+import { Loader2, MessageSquareDashed } from 'lucide-react'
+import { MensajeSistema } from './MensajeSistema'
 
 interface ChatMessagesProps {
     mensajes: MensajeResponse[]
@@ -12,7 +12,7 @@ interface ChatMessagesProps {
 export function ChatMessages({ mensajes, usuarioId, cargando }: ChatMessagesProps) {
     const bottomRef = useRef<HTMLDivElement>(null)
 
-    // Scroll al último mensaje siempre que cambian
+    // Scroll automático al último mensaje cada vez que llegan nuevos
     useEffect(() => {
         if (bottomRef.current) {
             bottomRef.current.scrollIntoView({ behavior: 'smooth' })
@@ -20,7 +20,12 @@ export function ChatMessages({ mensajes, usuarioId, cargando }: ChatMessagesProp
     }, [mensajes])
 
     if (cargando) {
-        return <ChatBubbleSkeleton />
+        return (
+            <div className="flex-1 flex flex-col items-center justify-center text-slate-500">
+                <Loader2 className="w-8 h-8 animate-spin text-primary mb-4" />
+                <p>Cargando mensajes...</p>
+            </div>
+        )
     }
 
     if (mensajes.length === 0) {
@@ -33,12 +38,22 @@ export function ChatMessages({ mensajes, usuarioId, cargando }: ChatMessagesProp
         )
     }
 
-    // Identificar si debemos mostrar el nombre del emisor (si los mensajes seguidos son de la misma persona)
     return (
         <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 bg-slate-50/30 dark:bg-slate-950/30">
             {mensajes.map((m, index) => {
+
+                // MNT-05 — mensajes del sistema se renderizan con componente separado
+                if (m.esSistema) {
+                    return (
+                        <div key={m.id}>
+                            <MensajeSistema contenido={m.contenido} />
+                        </div>
+                    )
+                }
+
                 const esMio = m.emisorId === usuarioId
                 const mensajeAnterior = index > 0 ? mensajes[index - 1] : null
+                // Muestra el nombre solo cuando cambia de remitente
                 const mostrarNombre = !esMio && (!mensajeAnterior || mensajeAnterior.emisorId !== m.emisorId)
 
                 return (
