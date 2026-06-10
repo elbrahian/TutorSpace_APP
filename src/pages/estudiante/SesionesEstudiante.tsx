@@ -11,11 +11,20 @@ import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { Calendar as CalendarIcon, Clock, User, Info, Star } from 'lucide-react'
 import { formatDate } from '../../utils/formatDate'
+import { CalendarSkeleton } from '../../components/ui/skeleton'
 
 export default function SesionesEstudiante() {
     const [sesiones, setSesiones] = useState<SesionResponse[]>([])
     const [selectedSesion, setSelectedSesion] = useState<SesionResponse | null>(null)
     const [evaluando, setEvaluando] = useState(false)
+    const [cargando, setCargando] = useState(true)
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 640)
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 640)
+        window.addEventListener('resize', handleResize)
+        return () => window.removeEventListener('resize', handleResize)
+    }, [])
 
     const fetchSesiones = useCallback(async () => {
         try {
@@ -23,6 +32,8 @@ export default function SesionesEstudiante() {
             setSesiones(data)
         } catch (e) {
             console.error(e)
+        } finally {
+            setCargando(false)
         }
     }, [])
 
@@ -97,26 +108,28 @@ export default function SesionesEstudiante() {
                         </div>
                     </div>
 
-                    <div className="fullcalendar-custom">
-                        <FullCalendar
-                            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                            initialView="dayGridMonth"
-                            headerToolbar={{
-                                left: 'prev,next today',
-                                center: 'title',
-                                right: 'dayGridMonth,timeGridWeek'
-                            }}
-                            events={eventos}
-                            eventClick={handleEventClick}
-                            height="600px"
-                            locale="es"
-                            buttonText={{
-                                today: 'Hoy',
-                                month: 'Mes',
-                                week: 'Semana'
-                            }}
-                        />
-                    </div>
+                    {cargando ? (
+                        <CalendarSkeleton />
+                    ) : (
+                        <div className="fullcalendar-custom">
+                            <FullCalendar
+                                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                                initialView="dayGridMonth"
+                                headerToolbar={{
+                                    left: 'prev,next',
+                                    center: 'title',
+                                    right: isMobile ? 'today' : 'today dayGridMonth,timeGridWeek'
+                                }}
+                                events={eventos}
+                                eventClick={handleEventClick}
+                                height={isMobile ? 'auto' : '600px'}
+                                locale="es"
+                                buttonText={{ today: 'Hoy', month: 'Mes', week: 'Semana' }}
+                                dayMaxEvents={isMobile ? 2 : 3}
+                                moreLinkText={(n) => `+${n} más`}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
 

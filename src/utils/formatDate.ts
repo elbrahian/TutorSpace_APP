@@ -1,6 +1,11 @@
 export const formatDate = (dateValue: string | Date | number): string => {
     try {
-        const d = new Date(dateValue)
+        // Si es un string de solo fecha (YYYY-MM-DD) se agrega T00:00:00 para que
+        // JavaScript lo trate como hora local y no UTC, evitando el desfase de un día.
+        const value = typeof dateValue === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateValue)
+            ? dateValue + 'T00:00:00'
+            : dateValue
+        const d = new Date(value)
         return d.toLocaleDateString('es-CO', {
             year: 'numeric',
             month: 'long',

@@ -10,6 +10,7 @@ import RegisterPage from '../pages/auth/RegisterPage'
 import EstudianteDashboard from '../pages/estudiante/EstudianteDashboard'
 import BuscarTutores from '../pages/estudiante/BuscarTutores'
 import SesionesEstudiante from '../pages/estudiante/SesionesEstudiante'
+import SolicitarSerTutorPage from '../pages/estudiante/SolicitarSerTutorPage'
 
 // Tutor Pages
 import TutorDashboard from '../pages/tutor/TutorDashboard'
@@ -17,6 +18,7 @@ import DisponibilidadPage from '../pages/tutor/DisponibilidadPage'
 import SesionesTutor from '../pages/tutor/SesionesTutor'
 import EvaluacionesTutor from '../pages/tutor/EvaluacionesTutor'
 import MisMateriasPage from '../pages/tutor/MisMateriasPage'
+import AgendarSesionPage from '../pages/tutor/AgendarSesionPage'
 
 // Admin Pages
 import AdminDashboard from '../pages/admin/AdminDashboard'
@@ -25,7 +27,9 @@ import GestionMaterias from '../pages/admin/GestionMaterias'
 import ReporteDesempenoTutores from '../pages/admin/ReporteDesempenoTutores'
 import ReporteDemandaTutores from '../pages/admin/ReporteDemandaTutores'
 import ReporteUsoPorRol from '../pages/admin/ReporteUsoPorRol'
+import ReporteCalificacionTutores from '../pages/admin/ReporteCalificacionTutores'
 import AuditoriaSesionesPage from '../pages/admin/AuditoriaSesionesPage'
+import SolicitudesTutorAdminPage from '../pages/admin/SolicitudesTutorAdminPage'
 
 // Shared Flow
 import ChatPage from '../pages/chat/ChatPage'
@@ -53,6 +57,7 @@ const AppRouter = () => {
                 <Route path="/estudiante" element={<EstudianteDashboard />} />
                 <Route path="/estudiante/buscar" element={<BuscarTutores />} />
                 <Route path="/estudiante/sesiones" element={<SesionesEstudiante />} />
+                <Route path="/estudiante/solicitar-tutor" element={<SolicitarSerTutorPage />} />
                 <Route path="/estudiante/chat" element={<ChatPage />} />
             </Route>
 
@@ -64,6 +69,7 @@ const AppRouter = () => {
                 <Route path="/tutor/evaluaciones" element={<EvaluacionesTutor />} />
                 <Route path="/tutor/chat" element={<ChatPage />} />
                 <Route path="/tutor/materias" element={<MisMateriasPage />} />
+                <Route path="/tutor/agendar" element={<AgendarSesionPage />} />
             </Route>
 
             {/* ADMIN ROUTES */}
@@ -74,7 +80,9 @@ const AppRouter = () => {
                 <Route path="/admin/reportes/tutores" element={<ReporteDesempenoTutores />} />
                 <Route path="/admin/reportes/demanda" element={<ReporteDemandaTutores />} />
                 <Route path="/admin/reportes/uso" element={<ReporteUsoPorRol />} />
+                <Route path="/admin/reportes/calificaciones" element={<ReporteCalificacionTutores />} />
                 <Route path="/admin/auditoria" element={<AuditoriaSesionesPage />} />
+                <Route path="/admin/solicitudes-tutor" element={<SolicitudesTutorAdminPage />} />
             </Route>
 
             {/* SHARED PROTECTED ROUTES */}
