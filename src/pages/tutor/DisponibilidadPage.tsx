@@ -9,6 +9,7 @@ import { Input } from '../../components/ui/input'
 import { tutorApi } from '../../api/tutorApi'
 import type { DisponibilidadResponse } from '../../types'
 import { Plus, Trash2, Clock, Pencil, X } from 'lucide-react'
+import { Tooltip } from '../../components/ui/tooltip'
 
 const disponibilidadSchema = z.object({
     dia: z.enum(['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO']),
@@ -218,25 +219,28 @@ export default function DisponibilidadPage() {
 
                                                 {f.estado === 'DISPONIBLE' && (
                                                     <div className="flex gap-1">
-                                                        {/* Bug 1: Botón editar en vista móvil */}
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => iniciarEdicion(f)}
-                                                            className="text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20 h-10 w-10 shrink-0"
-                                                            title="Editar franja"
-                                                        >
-                                                            <Pencil className="w-4 h-4 text-amber-500" />
-                                                        </Button>
-                                                        <Button
-                                                            variant="ghost"
-                                                            size="icon"
-                                                            onClick={() => eliminar(f.id)}
-                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 h-10 w-10 shrink-0"
-                                                            title="Eliminar franja"
-                                                        >
-                                                            <Trash2 className="w-5 h-5 text-red-500" />
-                                                        </Button>
+                                                        <Tooltip text="Editar franja" position="left">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => iniciarEdicion(f)}
+                                                                aria-label="Editar franja"
+                                                                className="text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20 h-11 w-11 shrink-0"
+                                                            >
+                                                                <Pencil className="w-4 h-4 text-amber-500" />
+                                                            </Button>
+                                                        </Tooltip>
+                                                        <Tooltip text="Eliminar franja" position="left">
+                                                            <Button
+                                                                variant="ghost"
+                                                                size="icon"
+                                                                onClick={() => eliminar(f.id)}
+                                                                aria-label="Eliminar franja"
+                                                                className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 h-11 w-11 shrink-0"
+                                                            >
+                                                                <Trash2 className="w-5 h-5 text-red-500" />
+                                                            </Button>
+                                                        </Tooltip>
                                                     </div>
                                                 )}
                                             </div>
@@ -272,25 +276,28 @@ export default function DisponibilidadPage() {
                                                         <td className="px-6 py-4 text-right">
                                                             {f.estado === 'DISPONIBLE' && (
                                                                 <div className="flex justify-end gap-1">
-                                                                    {/* Bug 1: Botón editar en vista desktop */}
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        onClick={() => iniciarEdicion(f)}
-                                                                        className="text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20"
-                                                                        title="Editar franja"
-                                                                    >
-                                                                        <Pencil className="w-4 h-4 text-amber-500" />
-                                                                    </Button>
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="icon"
-                                                                        onClick={() => eliminar(f.id)}
-                                                                        className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
-                                                                        title="Eliminar franja"
-                                                                    >
-                                                                        <Trash2 className="w-4 h-4 text-red-500" />
-                                                                    </Button>
+                                                                    <Tooltip text="Editar franja">
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="icon"
+                                                                            onClick={() => iniciarEdicion(f)}
+                                                                            aria-label="Editar franja"
+                                                                            className="text-amber-500 hover:text-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20 h-11 w-11"
+                                                                        >
+                                                                            <Pencil className="w-4 h-4 text-amber-500" />
+                                                                        </Button>
+                                                                    </Tooltip>
+                                                                    <Tooltip text="Eliminar franja">
+                                                                        <Button
+                                                                            variant="ghost"
+                                                                            size="icon"
+                                                                            onClick={() => eliminar(f.id)}
+                                                                            aria-label="Eliminar franja"
+                                                                            className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 h-11 w-11"
+                                                                        >
+                                                                            <Trash2 className="w-4 h-4 text-red-500" />
+                                                                        </Button>
+                                                                    </Tooltip>
                                                                 </div>
                                                             )}
                                                         </td>

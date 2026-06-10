@@ -17,25 +17,41 @@ import { useAuthStore } from '../store/authStore'
 import { stompSubscribe, stompUnsubscribe, getOrCreateStompClient } from './useStompClient'
 import type { ChatResponse, MensajeResponse } from '../types'
 
+const parsearError = (error: any, accion: string): string => {
+    const serverMsg = error?.response?.data?.message
+    if (serverMsg) return serverMsg
+    const status = error?.response?.status
+    if (status === 401) return 'Tu sesión expiró. Vuelve a iniciar sesión.'
+    if (status === 403) return `No tienes permiso para ${accion}.`
+    if (status === 404) return 'El recurso solicitado no existe.'
+    if (status === 409) return 'Ya existe una conversación con este tutor.'
+    if (status >= 500) return 'Error en el servidor. Intenta de nuevo en unos momentos.'
+    if (!navigator.onLine) return 'Sin conexión a internet. Verifica tu red.'
+    return `No se pudo ${accion}. Intenta de nuevo.`
+}
+
 export const useChat = () => {
     const { token, usuario } = useAuthStore()
-    const { 
+    const {
         chats, chatActivo, mensajes, cargando,
-        setChats, setChatActivo, setMensajes, agregarMensaje, setCargando 
+        setChats, setChatActivo, setMensajes, agregarMensaje, setCargando
     } = useChatStore()
 
     // Bug 6: Estado reactivo para saber cuándo el singleton está conectado
     const [stompConnected, setStompConnected] = useState(false)
     // Referencia al topic activo para limpiar al cambiar de chat
     const activeChatTopicRef = useRef<string | null>(null)
+    const [error, setError] = useState<string | null>(null)
 
     // Cargar mis chats
     const cargarChats = async () => {
         try {
+            setError(null)
             const data = await chatApi.getMisChats()
             setChats(data)
-        } catch (error) {
-            console.error('Error al cargar chats:', error)
+        } catch (err) {
+            console.error('Error al cargar chats:', err)
+            setError(parsearError(err, 'cargar las conversaciones'))
         }
     }
 
@@ -43,11 +59,15 @@ export const useChat = () => {
     const iniciarChat = async (tutorId: number) => {
         if (usuario?.rol !== 'ESTUDIANTE') return
         try {
+            setError(null)
             const resp = await chatApi.iniciarChat(tutorId)
             await cargarChats()
             setChatActivo(resp)
-        } catch (error) {
-            console.error('Error al iniciar chat:', error)
+        } catch (err: any) {
+            console.error('Error al iniciar chat:', err)
+            const msg = parsearError(err, 'iniciar la conversación con este tutor')
+            setError(msg)
+            throw new Error(msg)
         }
     }
 
@@ -55,10 +75,12 @@ export const useChat = () => {
     const enviarMensaje = async (contenido: string) => {
         if (!chatActivo) return
         try {
+            setError(null)
             await chatApi.enviarMensaje(chatActivo.id, contenido)
             // No lo agregamos manualmente porque lo recibiremos vía WebSocket
-        } catch (error: any) {
-            console.error('Error al enviar mensaje:', error.response?.data || error)
+        } catch (err: any) {
+            console.error('Error al enviar mensaje:', err.response?.data || err)
+            setError(parsearError(err, 'enviar el mensaje'))
         }
     }
 
@@ -111,14 +133,16 @@ export const useChat = () => {
         // Cargar mensajes históricos
         const cargarMensajes = async () => {
             try {
+                setError(null)
                 setCargando(true)
                 const resp = await chatApi.getMensajes(chatActivo.id)
                 const ordenados = [...resp.content].sort((a, b) =>
                     new Date(a.fecha).getTime() - new Date(b.fecha).getTime()
                 )
                 setMensajes(ordenados)
-            } catch (error) {
-                console.error('Error cargando mensajes:', error)
+            } catch (err) {
+                console.error('Error cargando mensajes:', err)
+                setError(parsearError(err, 'cargar los mensajes de esta conversación'))
             } finally {
                 setCargando(false)
             }
@@ -157,6 +181,8 @@ export const useChat = () => {
         chatActivo,
         mensajes,
         cargando,
+        error,
+        clearError: () => setError(null),
         cargarChats,
         iniciarChat,
         enviarMensaje,

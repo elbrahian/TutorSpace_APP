@@ -7,13 +7,13 @@ import type { EstadoSesion } from '../types'
 
 export const useSesiones = () => {
     const { usuario } = useAuthStore()
-    const { 
-        sesiones, 
-        cargando, 
-        setSesiones, 
-        agregarSesion, 
-        actualizarSesion, 
-        setCargando 
+    const {
+        sesiones,
+        cargando,
+        setSesiones,
+        agregarSesion,
+        actualizarSesion,
+        setCargando
     } = useSesionStore()
 
     const [totalPages, setTotalPages] = useState(0)
@@ -25,7 +25,7 @@ export const useSesiones = () => {
         if (!usuario) return
         try {
             setCargando(true)
-            const data = usuario.rol === 'TUTOR' 
+            const data = usuario.rol === 'TUTOR'
                 ? await sesionApi.getSesionesTutor()
                 : await sesionApi.getSesionesEstudiante()
             setSesiones(data)
@@ -102,9 +102,10 @@ export const useSesiones = () => {
     return {
         sesiones,
         cargando,
+        error,
+        clearError: () => setError(null),
         totalPages,
         totalElements,
-        error,
         actionLoading,
         cargarSesiones,
         cargarConFiltros,

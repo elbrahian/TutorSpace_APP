@@ -24,13 +24,13 @@ export function ChatSidebar({ chats, chatActivo, onSeleccionar, getNombreChat }:
     )
 
     return (
-        <div className="w-80 flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 flex flex-col h-full z-20">
+        <div className="w-full flex-shrink-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 flex flex-col h-full z-20">
             <div className="p-5 border-b border-slate-100 dark:border-slate-800 shadow-sm relative z-10">
                 <div className="flex items-center gap-3 mb-4">
-                    <button 
-                        onClick={() => navigate(-1)} // Volver atrás en el historial
-                        className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
-                        title="Volver atrás"
+                    <button
+                        onClick={() => navigate(-1)}
+                        aria-label="Volver atrás"
+                        className="flex items-center justify-center min-h-[44px] min-w-[44px] rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-colors bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800"
                     >
                         <ArrowLeft className="w-5 h-5" />
                     </button>

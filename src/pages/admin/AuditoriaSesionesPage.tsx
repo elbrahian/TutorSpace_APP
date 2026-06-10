@@ -5,17 +5,32 @@ import { Button } from '../../components/ui/button'
 import { auditoriaApi } from '../../api/auditoriaApi'
 import type { AuditoriaSesionResponse } from '../../types'
 import { exportarReportePdf } from '../../utils/exportarReportePdf'
-
-
+import {
+    Card,
+    CardHeader,
+    CardTitle,
+    CardContent
+} from '../../components/ui/card'
 
 const estadoBadge = (estado: string) => {
     const estilos: Record<string, string> = {
-        APROBADA: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
-        PENDIENTE: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-400',
-        CANCELADA: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400',
+        APROBADA:
+            'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400',
+        PENDIENTE:
+            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-400',
+        CANCELADA:
+            'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400',
+        COMPLETADA:
+            'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
     }
+
     return (
-        <span className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full ${estilos[estado] ?? 'bg-slate-100 text-slate-600'}`}>
+        <span
+            className={`inline-flex items-center px-3 py-1 text-xs font-semibold rounded-full ${
+                estilos[estado] ??
+                'bg-slate-100 text-slate-600'
+            }`}
+        >
             {estado}
         </span>
     )
@@ -27,195 +42,527 @@ const AuditoriaSesionesPage = () => {
     const [estadoNuevo, setEstadoNuevo] = useState('')
     const [tutor, setTutor] = useState('')
     const [estudiante, setEstudiante] = useState('')
+
+    const [fechaInicio, setFechaInicio] = useState('')
+    const [fechaFin, setFechaFin] = useState('')
+
     const [auditorias, setAuditorias] = useState<AuditoriaSesionResponse[]>([])
     const [loading, setLoading] = useState(false)
+    const [paginaActual, setPaginaActual] = useState(1)
+    const [totalPaginas, setTotalPaginas] = useState(0)
 
-    const fetchAuditorias = async (filtros?: {
+    
+
+    const fetchAuditorias = async (
+    pagina = 0,
+    filtros?: {
         estadoAnterior?: string
         estadoNuevo?: string
         tutor?: string
         estudiante?: string
-    }) => {
+        fechaInicio?: string
+        fechaFin?: string
+    }
+    ) => {
+
         try {
+
             setLoading(true)
-            const response = await auditoriaApi.getAuditoriaSesiones({
-                estadoAnterior: filtros?.estadoAnterior || undefined,
-                estadoNuevo: filtros?.estadoNuevo || undefined,
-                tutor: filtros?.tutor || undefined,
-                estudiante: filtros?.estudiante || undefined,
-            })
+
+            const response =
+                await auditoriaApi.getAuditoriaSesiones({
+
+                    estadoAnterior:
+                        filtros?.estadoAnterior || undefined,
+
+                    estadoNuevo:
+                        filtros?.estadoNuevo || undefined,
+
+                    tutor:
+                        filtros?.tutor || undefined,
+
+                    estudiante:
+                        filtros?.estudiante || undefined,
+
+                    fechaInicio:
+                         filtros?.fechaInicio || undefined,
+                    fechaFin: 
+                        filtros?.fechaFin || undefined,
+
+                    page: pagina,
+                    size: 20
+                })
+
             setAuditorias(response.content)
+
+            setTotalPaginas(response.totalPages)
+
         } catch (error) {
+
             console.error(error)
+
         } finally {
+
             setLoading(false)
         }
     }
 
     useEffect(() => {
-        fetchAuditorias()
-    }, [])
+    fetchAuditorias(0)
+}, [])
 
     const buscar = () => {
-        fetchAuditorias({ estadoAnterior, estadoNuevo, tutor, estudiante })
+
+    setPaginaActual(1)
+
+    fetchAuditorias(
+        0,
+        {
+            estadoAnterior,
+            estadoNuevo,
+            tutor,
+            estudiante,
+            fechaInicio,
+            fechaFin
+        }
+    )
     }
+
+    const auditoriasFiltradas = auditorias
+
 
     const limpiar = () => {
-        setEstadoAnterior('')
-        setEstadoNuevo('')
-        setTutor('')
-        setEstudiante('')
-        fetchAuditorias()
-    }
 
+    setEstadoAnterior('')
+    setEstadoNuevo('')
+    setTutor('')
+    setEstudiante('')
+
+    setFechaInicio('')
+    setFechaFin('')
+
+    setPaginaActual(1)
+
+    fetchAuditorias(0)
+}
+    
     const exportarPdf = async () => {
-        await exportarReportePdf({
-            title: 'Auditoría de Sesiones',
-            fileName: 'auditoria-sesiones.pdf',
-            subtitle: 'Historial de cambios de sesiones',
-            columns: [
-                { header: 'Sesión' },
-                { header: 'Tutor' },
-                { header: 'Estudiante' },
-                { header: 'Estado Anterior' },
-                { header: 'Estado Nuevo' },
-                { header: 'Fecha' }
-            ],
-            rows: auditorias.map(item => [
-                item.sesionId,
-                item.tutor,
-                item.estudiante,
-                item.estadoAnterior,
-                item.estadoNuevo,
-                item.fechaCambio
-            ])
-        })
+
+        try {
+
+            const response =
+                await auditoriaApi.getAuditoriaSesiones({
+
+                    estadoAnterior:
+                        estadoAnterior || undefined,
+
+                    estadoNuevo:
+                        estadoNuevo || undefined,
+
+                    tutor:
+                        tutor || undefined,
+
+                    estudiante:
+                        estudiante || undefined,
+
+                    fechaInicio:
+                        fechaInicio || undefined,
+
+                    fechaFin:
+                        fechaFin || undefined,
+
+                    page: 0,
+
+                    // número grande para traer todo
+                    size: 10000
+                })
+
+            await exportarReportePdf({
+
+                title: 'Auditoría de Sesiones',
+
+                fileName: 'auditoria-sesiones.pdf',
+
+                subtitle: 'Historial de cambios de sesiones',
+
+                columns: [
+                    { header: 'Sesión' },
+                    { header: 'Tutor' },
+                    { header: 'Estudiante' },
+                    { header: 'Estado Anterior' },
+                    { header: 'Estado Nuevo' },
+                    { header: 'Fecha' }
+                ],
+
+                rows: response.content.map((item: AuditoriaSesionResponse) => [
+
+                    item.sesionId,
+                    item.tutor,
+                    item.estudiante,
+                    item.estadoAnterior,
+                    item.estadoNuevo,
+                    new Date(item.fechaCambio).toLocaleString()
+
+                ])
+            })
+
+        } catch (error) {
+
+            console.error(error)
+        }
     }
 
     return (
+
         <DashboardLayout>
+
             <div className="space-y-6">
 
                 {/* Header */}
+
                 <div>
-                    <h1 className="text-3xl font-bold">Auditoría de Sesiones</h1>
-                    <p className="text-slate-400 mt-2">
+
+                    <h1 className="text-3xl font-bold">
+                        Auditoría de Sesiones
+                    </h1>
+
+                    <p className="text-muted-foreground mt-2">
                         Consulta y exporta el historial de cambios de las sesiones.
                     </p>
+
                 </div>
 
                 {/* Filtros */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
-                    <h2 className="text-lg font-semibold mb-4">Filtros</h2>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <select
-                            value={estadoAnterior}
-                            onChange={(e) => setEstadoAnterior(e.target.value)}
-                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
-                        >
-                            <option value="">Estado anterior</option>
-                            <option value="PENDIENTE">Pendiente</option>
-                            <option value="APROBADA">Aprobada</option>
-                            <option value="CANCELADA">Cancelada</option>
-                        </select>
+                <Card>
 
-                        <select
-                            value={estadoNuevo}
-                            onChange={(e) => setEstadoNuevo(e.target.value)}
-                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
-                        >
-                            <option value="">Estado nuevo</option>
-                            <option value="PENDIENTE">Pendiente</option>
-                            <option value="APROBADA">Aprobada</option>
-                            <option value="CANCELADA">Cancelada</option>
-                        </select>
+                    <CardHeader>
 
-                        <input
-                            value={tutor}
-                            onChange={(e) => setTutor(e.target.value)}
-                            placeholder="Tutor"
-                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
-                        />
+                        <CardTitle>
+                            Filtros
+                        </CardTitle>
 
-                        <input
-                            value={estudiante}
-                            onChange={(e) => setEstudiante(e.target.value)}
-                            placeholder="Estudiante"
-                            className="w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2"
-                        />
-                    </div>
+                    </CardHeader>
 
-                    <div className="flex gap-3 mt-6">
-                        <Button onClick={buscar} className="flex items-center gap-2">
-                            <Search size={18} />
-                            Buscar
-                        </Button>
+                    <CardContent>
 
-                        <Button onClick={limpiar} className="flex items-center gap-2">
-                            <RotateCcw size={18} />
-                            Limpiar
-                        </Button>
 
-                        <Button onClick={exportarPdf} className="flex items-center gap-2">
-                            <FileDown size={18} />
-                            Exportar PDF
-                        </Button>
-                    </div>
-                </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+
+                            <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Estado Anterior
+                                    </label>
+
+                            <select
+                                value={estadoAnterior}
+                                onChange={(e) => setEstadoAnterior(e.target.value)}
+                                className="w-full rounded-lg border border-input bg-background px-3 py-2"
+                            >
+                                <option value="">Sin filtro</option>
+                                <option value="COMPLETADA">Completada</option>
+                                <option value="PENDIENTE">Pendiente</option>
+                                <option value="APROBADA">Aprobada</option>
+                                <option value="CANCELADA">Cancelada</option>
+                            </select>
+                            </div>
+
+
+                            <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Estado Nuevo
+                                    </label>
+                            <select
+                                value={estadoNuevo}
+                                onChange={(e) => setEstadoNuevo(e.target.value)}
+                                className="w-full rounded-lg border border-input bg-background px-3 py-2"
+                            >
+                                <option value="">Sin filtro</option>
+                                <option value="COMPLETADA">Completada</option>
+                                <option value="PENDIENTE">Pendiente</option>
+                                <option value="APROBADA">Aprobada</option>
+                                <option value="CANCELADA">Cancelada</option>
+                            </select>
+                            </div>
+
+                            <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Tutor
+                                    </label>
+                            <input
+                                value={tutor}
+                                onChange={(e) => setTutor(e.target.value)}
+                                placeholder="Tutor"
+                                className="w-full rounded-lg border border-input bg-background px-3 py-2"
+                            />
+                            </div>
+
+                            <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Estudiante
+                                    </label>
+                            <input
+                                value={estudiante}
+                                onChange={(e) => setEstudiante(e.target.value)}
+                                placeholder="Estudiante"
+                                className="w-full rounded-lg border border-input bg-background px-3 py-2"
+                            />
+                            </div>
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Fecha inicio
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        value={fechaInicio}
+                                        onChange={(e) => setFechaInicio(e.target.value)}
+                                        className="w-full rounded-lg border border-input bg-background px-3 py-2"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Fecha fin
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        value={fechaFin}
+                                        onChange={(e) => setFechaFin(e.target.value)}
+                                        className="w-full rounded-lg border border-input bg-background px-3 py-2"
+                                    />
+                                </div>
+
+                        </div>
+
+                        <div className="flex flex-wrap gap-3 mt-6">
+
+                            <Button
+                                onClick={buscar}
+                                className="flex items-center gap-2"
+                            >
+                                <Search size={18} />
+                                Aplicar Filtros
+                            </Button>
+
+                            <Button
+                                variant="outline"
+                                onClick={limpiar}
+                                className="flex items-center gap-2"
+                            >
+                                <RotateCcw size={18} />
+                                Limpiar
+                            </Button>
+
+                            <Button
+                                onClick={exportarPdf}
+                                className="flex items-center gap-2"
+                            >
+                                <FileDown size={18} />
+                                Exportar PDF
+                            </Button>
+
+                        </div>
+
+                    </CardContent>
+
+                </Card>
 
                 {/* Resultados */}
-                <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-                    <div className="p-6 border-b border-slate-800">
-                        <h2 className="font-semibold">Historial de Sesiones</h2>
-                    </div>
 
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-slate-950">
-                                <tr>
-                                    <th className="px-4 py-3 text-left">Sesión</th>
-                                    <th className="px-4 py-3 text-left">Tutor</th>
-                                    <th className="px-4 py-3 text-left">Estudiante</th>
-                                    <th className="px-4 py-3 text-left">Estado Anterior</th>
-                                    <th className="px-4 py-3 text-left">Estado Nuevo</th>
-                                    <th className="px-4 py-3 text-left">Fecha</th>
-                                </tr>
-                            </thead>
+                <Card>
 
-                            <tbody>
-                                {loading ? (
+                    <CardHeader>
+
+                        <CardTitle>
+                            Historial de Sesiones
+                        </CardTitle>
+
+                    </CardHeader>
+
+                    <CardContent className="p-0">
+
+                        <div className="overflow-x-auto">
+
+                            <table className="w-full">
+
+                                <thead className="bg-muted">
+
                                     <tr>
-                                        <td colSpan={6} className="px-4 py-6 text-center text-slate-400">
-                                            Cargando...
-                                        </td>
+
+                                        <th className="px-4 py-3 text-left">
+                                            Sesión
+                                        </th>
+
+                                        <th className="px-4 py-3 text-left">
+                                            Tutor
+                                        </th>
+
+                                        <th className="px-4 py-3 text-left">
+                                            Estudiante
+                                        </th>
+
+                                        <th className="px-4 py-3 text-left">
+                                            Estado Anterior
+                                        </th>
+
+                                        <th className="px-4 py-3 text-left">
+                                            Estado Nuevo
+                                        </th>
+
+                                        <th className="px-4 py-3 text-left">
+                                            Fecha
+                                        </th>
+
                                     </tr>
-                                ) : auditorias.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={6} className="px-4 py-6 text-center text-slate-400">
-                                            No hay registros disponibles.
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    auditorias.map(item => (
-                                        <tr key={item.sesionId + item.fechaCambio} className="border-t border-slate-800">
-                                            <td className="px-4 py-3">{item.sesionId}</td>
-                                            <td className="px-4 py-3">{item.tutor}</td>
-                                            <td className="px-4 py-3">{item.estudiante}</td>
-                                            <td className="px-4 py-3">{estadoBadge(item.estadoAnterior)}</td>
-                                            <td className="px-4 py-3">{estadoBadge(item.estadoNuevo)}</td>
-                                            <td className="px-4 py-3">
-                                                {new Date(item.fechaCambio).toLocaleString()}
+
+                                </thead>
+
+                                <tbody>
+
+                                    {loading ? (
+
+                                        <tr>
+
+                                            <td
+                                                colSpan={6}
+                                                className="px-4 py-8 text-center text-muted-foreground"
+                                            >
+                                                Cargando...
                                             </td>
+
                                         </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+
+                                    ) : auditoriasFiltradas.length === 0 ? (
+
+                                        <tr>
+
+                                            <td
+                                                colSpan={6}
+                                                className="px-4 py-8 text-center text-muted-foreground"
+                                            >
+                                                No hay registros disponibles.
+                                            </td>
+
+                                        </tr>
+
+                                    ) : (
+
+                                        auditoriasFiltradas.map(item => (
+
+                                            <tr
+                                                key={item.sesionId + item.fechaCambio}
+                                                className="border-t"
+                                            >
+
+                                                <td className="px-4 py-3">
+                                                    {item.sesionId}
+                                                </td>
+
+                                                <td className="px-4 py-3">
+                                                    {item.tutor}
+                                                </td>
+
+                                                <td className="px-4 py-3">
+                                                    {item.estudiante}
+                                                </td>
+
+                                                <td className="px-4 py-3">
+                                                    {estadoBadge(item.estadoAnterior)}
+                                                </td>
+
+                                                <td className="px-4 py-3">
+                                                    {estadoBadge(item.estadoNuevo)}
+                                                </td>
+
+                                                <td className="px-4 py-3">
+                                                    {new Date(item.fechaCambio).toLocaleString()}
+                                                </td>
+
+                                            </tr>
+
+                                        ))
+
+                                    )}
+
+                                </tbody>
+
+                            </table>
+
+<div className="flex items-center justify-between px-4 py-4 border-t">
+
+    <span className="text-sm text-muted-foreground">
+
+    Página {paginaActual} de {totalPaginas}
+
+    </span>
+
+    <div className="flex items-center gap-2">
+
+        <Button
+            variant="outline"
+            disabled={paginaActual === 1}
+            onClick={() => {
+
+                const nuevaPagina = paginaActual - 1
+
+                setPaginaActual(nuevaPagina)
+
+                fetchAuditorias(
+                    nuevaPagina - 1,
+                    {
+                        estadoAnterior,
+                        estadoNuevo,
+                        tutor,
+                        estudiante,
+                        fechaInicio,
+                        fechaFin
+                    }
+                )
+            }}
+        >
+            Anterior
+        </Button>
+
+
+        <Button
+            variant="outline"
+            disabled={paginaActual >= totalPaginas}
+            onClick={() => {
+
+                const nuevaPagina = paginaActual + 1
+
+                setPaginaActual(nuevaPagina)
+
+                fetchAuditorias(
+                    nuevaPagina - 1,
+                    {
+                        estadoAnterior,
+                        estadoNuevo,
+                        tutor,
+                        estudiante,
+                        fechaInicio,
+                        fechaFin
+                    }
+                )
+            }}
+        >
+            Siguiente
+        </Button>
+
+    </div>
+
+</div>
+
+</div>
+
+                    </CardContent>
+
+                </Card>
 
             </div>
+
         </DashboardLayout>
     )
 }

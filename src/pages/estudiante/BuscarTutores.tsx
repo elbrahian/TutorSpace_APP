@@ -9,6 +9,7 @@ import { useChatStore } from '../../store/chatStore'
 import type { MateriaResponse, TutorBusquedaResponse } from '../../types'
 import { Search, MessageSquare, Clock, RefreshCw } from 'lucide-react'
 import { tiempoRelativo } from '../../utils/formatDate'
+import { TutorCardSkeleton } from '../../components/ui/skeleton'
 
 export default function BuscarTutores() {
     const [materias, setMaterias] = useState<MateriaResponse[]>([])
@@ -159,7 +160,9 @@ export default function BuscarTutores() {
 
                 <div className="mt-8">
                     {loading ? (
-                        <div className="flex justify-center py-12 text-slate-500">Buscando tutores...</div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {Array.from({ length: 6 }).map((_, i) => <TutorCardSkeleton key={i} />)}
+                        </div>
                     ) : !materiaId ? (
                         <div className="text-center py-12 text-slate-500 bg-slate-50 dark:bg-slate-900 border border-dashed rounded-xl">
                             Por favor selecciona una materia para ver los tutores disponibles.
