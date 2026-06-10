@@ -5,18 +5,17 @@ import { FiltrosSesiones } from '../../components/sesiones/FiltrosSesiones';
 import type { Filtros } from '../../components/sesiones/FiltrosSesiones';
 import { AccionesSesion } from '../../components/sesiones/AccionesSesion';
 import { Button } from '../../components/ui/button';
-import { ChevronUp, ChevronDown, Calendar, Clock, BookOpen, AlertCircle } from 'lucide-react';
+import { ChevronUp, ChevronDown, Calendar, Clock } from 'lucide-react';
 import { formatDate } from '../../utils/formatDate';
 
 export default function MisTutoriasPage() {
-    const { 
-        sesiones, 
-        cargando, 
-        error, 
-        totalPages, 
+    const {
+        sesiones,
+        cargando,
+        totalPages,
         totalElements,
-        cargarConFiltros, 
-        ejecutarAccion 
+        cargarConFiltros,
+        ejecutarAccion
     } = useSesiones();
 
     const [filtros, setFiltros] = useState<Filtros>({});
@@ -71,20 +70,20 @@ export default function MisTutoriasPage() {
                         <table className="w-full text-sm text-left">
                             <thead className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 font-medium border-b border-slate-200 dark:border-slate-800">
                                 <tr>
-                                    <th 
+                                    <th
                                         className="px-6 py-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                         onClick={() => handleSort('nombreEstudiante')}
                                     >
                                         Estudiante {renderSortIcon('nombreEstudiante')}
                                     </th>
-                                    <th 
+                                    <th
                                         className="px-6 py-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                         onClick={() => handleSort('fecha')}
                                     >
                                         Fecha {renderSortIcon('fecha')}
                                     </th>
                                     <th className="px-6 py-4">Horario</th>
-                                    <th 
+                                    <th
                                         className="px-6 py-4 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                                         onClick={() => handleSort('estado')}
                                     >
@@ -129,19 +128,18 @@ export default function MisTutoriasPage() {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4">
-                                                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${
-                                                    sesion.estado === 'APROBADA' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' :
+                                                <span className={`inline-flex px-2 py-1 rounded-full text-xs font-semibold uppercase tracking-wider border ${sesion.estado === 'APROBADA' ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20' :
                                                     sesion.estado === 'COMPLETADA' ? 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-500/10 dark:text-blue-400 dark:border-blue-500/20' :
-                                                    sesion.estado === 'PENDIENTE' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' :
-                                                    'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20'
-                                                }`}>
+                                                        sesion.estado === 'PENDIENTE' ? 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-500/20' :
+                                                            'bg-red-50 text-red-700 border-red-200 dark:bg-red-500/10 dark:text-red-400 dark:border-red-500/20'
+                                                    }`}>
                                                     {sesion.estado}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-right">
-                                                <AccionesSesion 
-                                                    sesion={sesion} 
-                                                    onAccion={ejecutarAccion} 
+                                                <AccionesSesion
+                                                    sesion={sesion}
+                                                    onAccion={ejecutarAccion}
                                                 />
                                             </td>
                                         </tr>
@@ -150,7 +148,7 @@ export default function MisTutoriasPage() {
                             </tbody>
                         </table>
                     </div>
-                    
+
                     {/* Paginación */}
                     {!cargando && sesiones.length > 0 && totalPages > 0 && (
                         <div className="px-6 py-4 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
@@ -158,16 +156,16 @@ export default function MisTutoriasPage() {
                                 Mostrando página {page + 1} de {totalPages} ({totalElements} resultados)
                             </span>
                             <div className="flex gap-2">
-                                <Button 
-                                    variant="outline" 
+                                <Button
+                                    variant="outline"
                                     size="sm"
                                     onClick={() => setPage(p => Math.max(0, p - 1))}
                                     disabled={page === 0}
                                 >
                                     Anterior
                                 </Button>
-                                <Button 
-                                    variant="outline" 
+                                <Button
+                                    variant="outline"
                                     size="sm"
                                     onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
                                     disabled={page >= totalPages - 1}
