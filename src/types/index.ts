@@ -87,12 +87,14 @@ export interface EvaluacionEstudianteResponse {
     creadoEn: string
 }
 
+// MNT-05 - emisorId es null y esSistema es true cuando el mensaje es automático
 export interface MensajeResponse {
     id: number
-    emisorId: number
-    nombreEmisor: string
+    emisorId: number | null  // null si es mensaje del sistema
+    nombreEmisor: string     // "Sistema" si esSistema = true
     contenido: string
     fecha: string
+    esSistema: boolean
 }
 
 export interface ChatResponse {
