@@ -181,3 +181,25 @@ export interface ReporteUsoResponse {
     metricasPorRol: UsoPorRolResponse[]
     actividadSemanal: ActividadSemanalResponse[]
 }
+
+export interface ComentarioCalificacionTutorResponse {
+    calificacionId: number
+    tutorId: number
+    nombreEstudiante: string
+    calificacion: number
+    comentario: string
+    fechaSesion: string
+}
+
+export interface ReporteCalificacionTutorResponse {
+    tutorId: number
+    nombreTutor: string
+    promedioCalificacion: number
+    totalEvaluaciones: number
+    estrellas1: number
+    estrellas2: number
+    estrellas3: number
+    estrellas4: number
+    estrellas5: number
+    comentarios: ComentarioCalificacionTutorResponse[]
+}
