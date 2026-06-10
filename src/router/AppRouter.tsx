@@ -18,12 +18,15 @@ import DisponibilidadPage from '../pages/tutor/DisponibilidadPage'
 import SesionesTutor from '../pages/tutor/SesionesTutor'
 import EvaluacionesTutor from '../pages/tutor/EvaluacionesTutor'
 import MisMateriasPage from '../pages/tutor/MisMateriasPage'
+import AgendarSesionPage from '../pages/tutor/AgendarSesionPage'
 
 // Admin Pages
 import AdminDashboard from '../pages/admin/AdminDashboard'
 import GestionTutores from '../pages/admin/GestionTutores'
 import GestionMaterias from '../pages/admin/GestionMaterias'
 import ReporteDesempenoTutores from '../pages/admin/ReporteDesempenoTutores'
+import ReporteUsoPorRol from '../pages/admin/ReporteUsoPorRol'
+import ReporteCalificacionTutores from '../pages/admin/ReporteCalificacionTutores'
 import AuditoriaSesionesPage from '../pages/admin/AuditoriaSesionesPage'
 import SolicitudesTutorAdminPage from '../pages/admin/SolicitudesTutorAdminPage'
 
@@ -65,6 +68,7 @@ const AppRouter = () => {
                 <Route path="/tutor/evaluaciones" element={<EvaluacionesTutor />} />
                 <Route path="/tutor/chat" element={<ChatPage />} />
                 <Route path="/tutor/materias" element={<MisMateriasPage />} />
+                <Route path="/tutor/agendar" element={<AgendarSesionPage />} />
             </Route>
 
             {/* ADMIN ROUTES */}
@@ -73,6 +77,8 @@ const AppRouter = () => {
                 <Route path="/admin/tutores" element={<GestionTutores />} />
                 <Route path="/admin/materias" element={<GestionMaterias />} />
                 <Route path="/admin/reportes/tutores" element={<ReporteDesempenoTutores />} />
+                <Route path="/admin/reportes/uso" element={<ReporteUsoPorRol />} />
+                <Route path="/admin/reportes/calificaciones" element={<ReporteCalificacionTutores />} />
                 <Route path="/admin/auditoria" element={<AuditoriaSesionesPage />} />
                 <Route path="/admin/solicitudes-tutor" element={<SolicitudesTutorAdminPage />} />
             </Route>

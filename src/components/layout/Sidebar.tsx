@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock, BarChart3, Activity, ChevronDown, Star, ClipboardCheck, GraduationCap } from 'lucide-react'
+import { LayoutDashboard, Users, Calendar, MessageSquare, BookOpen, Clock, BarChart3, Activity, ChevronDown, Star, PieChart, X, CalendarPlus, ClipboardCheck, GraduationCap } from 'lucide-react'
 import { useState } from 'react'
 import type { ReactNode } from 'react'
 import { useAuthStore } from '../../store/authStore'
@@ -47,6 +47,8 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                         icon: <BarChart3 className="w-5 h-5" />,
                         children: [
                             { type: 'link', name: 'Desempeño', path: '/admin/reportes/tutores', icon: <Activity className="w-4 h-4" /> },
+                            { type: 'link', name: 'Uso por Rol', path: '/admin/reportes/uso', icon: <PieChart className="w-4 h-4" /> },
+                            { type: 'link', name: 'Calificaciones', path: '/admin/reportes/calificaciones', icon: <Star className="w-4 h-4" /> },
                         ],
                     },
                 ]
@@ -56,6 +58,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     { type: 'link', name: 'Disponibilidad', path: '/tutor/disponibilidad', icon: <Clock className="w-5 h-5" /> },
                     { type: 'link', name: 'Sesiones', path: '/tutor/sesiones', icon: <Calendar className="w-5 h-5" /> },
                     { type: 'link', name: 'Evaluar estudiante', path: '/tutor/evaluaciones', icon: <Star className="w-5 h-5" /> },
+                    { type: 'link', name: 'Agendar Sesión', path: '/tutor/agendar', icon: <CalendarPlus className="w-5 h-5" /> },
                     { type: 'link', name: 'Chat', path: '/tutor/chat', icon: <MessageSquare className="w-5 h-5" /> },
                     { type: 'link', name: 'Mis Materias', path: '/tutor/materias', icon: <BookOpen className="w-5 h-5" /> },
                 ]
@@ -88,7 +91,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                 key={link.path}
                 to={link.path}
                 onClick={onClose}
-                className={`flex items-center gap-3 rounded-lg transition-colors ${nested ? 'ml-8 px-3 py-2 text-sm' : 'px-3 py-2.5'} ${isActive
+                className={`flex items-center gap-3 rounded-lg transition-colors min-h-[44px] ${nested ? 'ml-8 px-3 py-2 text-sm' : 'px-3 py-3'} ${isActive
                         ? 'bg-primary text-primary-foreground font-medium'
                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`}
@@ -112,7 +115,14 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     <BookOpen className="w-6 h-6" />
                     <span>TutorSpace</span>
                 </div>
-                {/* Botón opcional para cerrar dentro del aside si se prefiere */}
+                <button
+                    type="button"
+                    onClick={onClose}
+                    aria-label="Cerrar menú"
+                    className="flex items-center justify-center h-11 w-11 rounded-lg text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors"
+                >
+                    <X className="w-5 h-5" />
+                </button>
             </div>
 
             <nav className="p-4 space-y-2">
@@ -127,7 +137,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                             <button
                                 type="button"
                                 onClick={() => toggleSection(item.name)}
-                                className={`flex w-full items-center gap-3 px-3 py-2.5 rounded-lg transition-colors font-medium ${isActive
+                                className={`flex w-full items-center gap-3 px-3 py-3 min-h-[44px] rounded-lg transition-colors font-medium ${isActive
                                         ? 'text-slate-900 dark:text-slate-100 bg-slate-100 dark:bg-slate-800'
                                         : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                                     }`}
