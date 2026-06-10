@@ -23,15 +23,13 @@ import AdminDashboard from '../pages/admin/AdminDashboard'
 import GestionTutores from '../pages/admin/GestionTutores'
 import GestionMaterias from '../pages/admin/GestionMaterias'
 import ReporteDesempenoTutores from '../pages/admin/ReporteDesempenoTutores'
+import ReporteDemandaTutores from '../pages/admin/ReporteDemandaTutores'
 import ReporteUsoPorRol from '../pages/admin/ReporteUsoPorRol'
 import AuditoriaSesionesPage from '../pages/admin/AuditoriaSesionesPage'
-import ReporteDemandaTutores from '../pages/admin/ReporteDemandaTutores'
 
 // Shared Flow
 import ChatPage from '../pages/chat/ChatPage'
 import NotificacionesPage from '../pages/notificaciones/NotificacionesPage'
-
-
 
 const AppRouter = () => {
     const { token, usuario } = useAuthStore()
@@ -74,9 +72,9 @@ const AppRouter = () => {
                 <Route path="/admin/tutores" element={<GestionTutores />} />
                 <Route path="/admin/materias" element={<GestionMaterias />} />
                 <Route path="/admin/reportes/tutores" element={<ReporteDesempenoTutores />} />
+                <Route path="/admin/reportes/demanda" element={<ReporteDemandaTutores />} />
                 <Route path="/admin/reportes/uso" element={<ReporteUsoPorRol />} />
                 <Route path="/admin/auditoria" element={<AuditoriaSesionesPage />} />
-                <Route path="/admin/reportes/demanda" element={<ReporteDemandaTutores />} />
             </Route>
 
             {/* SHARED PROTECTED ROUTES */}

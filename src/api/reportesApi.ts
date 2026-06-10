@@ -1,5 +1,6 @@
 import axiosInstance from './axiosInstance'
-import type { ReporteDesempenoTutorResponse, ReporteDemandaResponse, ReporteUsoResponse } from '../types'
+import type { ReporteCalificacionTutorResponse, ReporteDesempenoTutorResponse, ReporteUsoResponse, ReporteDemandaResponse } from '../types'
+
 interface ReporteDesempenoTutoresParams {
     fechaInicio?: string
     fechaFin?: string
@@ -11,6 +12,11 @@ interface ReporteDemandaParams {
 }
 
 interface ReporteUsoParams {
+    fechaInicio?: string
+    fechaFin?: string
+}
+
+interface ReporteCalificacionesParams {
     fechaInicio?: string
     fechaFin?: string
 }
@@ -28,6 +34,11 @@ export const reportesApi = {
 
     getUsoPorRol: async (params: ReporteUsoParams): Promise<ReporteUsoResponse> => {
         const response = await axiosInstance.get('/admin/reportes/uso', { params })
+        return response.data
+    },
+
+    getCalificacionesTutores: async (params: ReporteCalificacionesParams): Promise<ReporteCalificacionTutorResponse[]> => {
+        const response = await axiosInstance.get('/admin/reportes/calificaciones', { params })
         return response.data
     }
 }
