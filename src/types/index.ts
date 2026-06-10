@@ -130,18 +130,26 @@ export interface PageResponse<T> {
 }
 
 export interface AuditoriaSesionResponse {
-
     sesionId: number
-
     tutor: string
-
     estudiante: string
-
     estadoAnterior: string
-
     estadoNuevo: string
-
     fechaCambio: string
+}
+
+// MNT-09 - Reporte de Oferta y Demanda de Tutores
+export interface MateriaDemandaResponse {
+    materia: string
+    sesionesSolicitadas: number
+    tutoresDisponibles: number
+    tasaCobertura: number | null
+}
+
+export interface ReporteDemandaResponse {
+    materias: MateriaDemandaResponse[]
+    top5MayorDemanda: MateriaDemandaResponse[]
+    top5MenorDemanda: MateriaDemandaResponse[]
 }
 
 // MNT-11 - Reporte de Uso de la Plataforma por Rol
@@ -168,4 +176,27 @@ export interface ReporteUsoResponse {
     totalMensajesEnviados: number
     metricasPorRol: UsoPorRolResponse[]
     actividadSemanal: ActividadSemanalResponse[]
+}
+
+// MNT-10 - Reporte de Calificación de Tutores
+export interface ComentarioCalificacionTutorResponse {
+    calificacionId: number
+    tutorId: number
+    nombreEstudiante: string
+    calificacion: number
+    comentario: string
+    fechaSesion: string
+}
+
+export interface ReporteCalificacionTutorResponse {
+    tutorId: number
+    nombreTutor: string
+    promedioCalificacion: number
+    totalEvaluaciones: number
+    estrellas1: number
+    estrellas2: number
+    estrellas3: number
+    estrellas4: number
+    estrellas5: number
+    comentarios: ComentarioCalificacionTutorResponse[]
 }

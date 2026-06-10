@@ -69,8 +69,9 @@ export default function ChatPage() {
                                     <Button
                                         variant="ghost"
                                         size="icon"
-                                        className="lg:hidden -ml-2 h-8 w-8"
+                                        className="lg:hidden -ml-2 h-11 w-11"
                                         onClick={() => setMobileView('lista')}
+                                        aria-label="Volver a la lista de chats"
                                     >
                                         <ChevronLeft className="w-6 h-6" />
                                     </Button>
@@ -95,10 +96,11 @@ export default function ChatPage() {
                                         <Button
                                             size="sm"
                                             variant="outline"
-                                            className="ml-auto bg-primary/5 text-primary hover:bg-primary/10 border-primary/20 h-9 px-3"
+                                            className="ml-auto bg-primary/5 text-primary hover:bg-primary/10 border-primary/20 h-11 px-3"
                                             onClick={() => setDialogOpen(true)}
+                                            aria-label="Agendar sesión"
                                         >
-                                            <CalendarPlus className="w-4 h-4 md:mr-2" /> 
+                                            <CalendarPlus className="w-4 h-4 md:mr-2" />
                                             <span className="hidden md:inline">Agendar Sesión</span>
                                         </Button>
                                     )}

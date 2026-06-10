@@ -39,12 +39,12 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
     return (
         <nav className="h-16 border-b bg-white dark:bg-slate-950 flex items-center justify-between px-4 md:px-6 sticky top-0 z-50">
             <div className="flex items-center gap-3">
-                <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="lg:hidden" 
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    className="lg:hidden h-11 w-11"
                     onClick={onMenuClick}
-                    title="Menu"
+                    aria-label="Abrir menú de navegación"
                 >
                     <Menu className="w-6 h-6 text-slate-600 dark:text-slate-400" />
                 </Button>
@@ -70,7 +70,7 @@ export const Navbar = ({ onMenuClick }: NavbarProps) => {
 
                 <NotificacionBell />
 
-                <Button variant="ghost" size="icon" onClick={handleLogout} title="Cerrar sesión">
+                <Button variant="ghost" size="icon" className="h-11 w-11" onClick={handleLogout} aria-label="Cerrar sesión">
                     <LogOut className="w-5 h-5 text-slate-500 hover:text-red-500" />
                 </Button>
             </div>
