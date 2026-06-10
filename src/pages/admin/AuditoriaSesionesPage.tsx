@@ -146,37 +146,70 @@ const AuditoriaSesionesPage = () => {
     fetchAuditorias(0)
 }
     
-
     const exportarPdf = async () => {
 
-        await exportarReportePdf({
+        try {
 
-            title: 'Auditoría de Sesiones',
+            const response =
+                await auditoriaApi.getAuditoriaSesiones({
 
-            fileName: 'auditoria-sesiones.pdf',
+                    estadoAnterior:
+                        estadoAnterior || undefined,
 
-            subtitle: 'Historial de cambios de sesiones',
+                    estadoNuevo:
+                        estadoNuevo || undefined,
 
-            columns: [
-                { header: 'Sesión' },
-                { header: 'Tutor' },
-                { header: 'Estudiante' },
-                { header: 'Estado Anterior' },
-                { header: 'Estado Nuevo' },
-                { header: 'Fecha' }
-            ],
+                    tutor:
+                        tutor || undefined,
 
-            rows: auditoriasFiltradas.map(item => [
+                    estudiante:
+                        estudiante || undefined,
 
-                item.sesionId,
-                item.tutor,
-                item.estudiante,
-                item.estadoAnterior,
-                item.estadoNuevo,
-                item.fechaCambio
+                    fechaInicio:
+                        fechaInicio || undefined,
 
-            ])
-        })
+                    fechaFin:
+                        fechaFin || undefined,
+
+                    page: 0,
+
+                    // número grande para traer todo
+                    size: 10000
+                })
+
+            await exportarReportePdf({
+
+                title: 'Auditoría de Sesiones',
+
+                fileName: 'auditoria-sesiones.pdf',
+
+                subtitle: 'Historial de cambios de sesiones',
+
+                columns: [
+                    { header: 'Sesión' },
+                    { header: 'Tutor' },
+                    { header: 'Estudiante' },
+                    { header: 'Estado Anterior' },
+                    { header: 'Estado Nuevo' },
+                    { header: 'Fecha' }
+                ],
+
+                rows: response.content.map(item => [
+
+                    item.sesionId,
+                    item.tutor,
+                    item.estudiante,
+                    item.estadoAnterior,
+                    item.estadoNuevo,
+                    new Date(item.fechaCambio).toLocaleString()
+
+                ])
+            })
+
+        } catch (error) {
+
+            console.error(error)
+        }
     }
 
     return (
