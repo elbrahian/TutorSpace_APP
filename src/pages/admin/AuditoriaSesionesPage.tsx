@@ -20,6 +20,8 @@ const estadoBadge = (estado: string) => {
             'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-400',
         CANCELADA:
             'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400',
+        COMPLETADA:
+            'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400',
     }
 
     return (
@@ -47,15 +49,21 @@ const AuditoriaSesionesPage = () => {
     const [auditorias, setAuditorias] = useState<AuditoriaSesionResponse[]>([])
     const [loading, setLoading] = useState(false)
     const [paginaActual, setPaginaActual] = useState(1)
+    const [totalPaginas, setTotalPaginas] = useState(0)
 
-    const registrosPorPagina = 10
+    
 
-    const fetchAuditorias = async (filtros?: {
+    const fetchAuditorias = async (
+    pagina = 0,
+    filtros?: {
         estadoAnterior?: string
         estadoNuevo?: string
         tutor?: string
         estudiante?: string
-    }) => {
+        fechaInicio?: string
+        fechaFin?: string
+    }
+    ) => {
 
         try {
 
@@ -75,9 +83,19 @@ const AuditoriaSesionesPage = () => {
 
                     estudiante:
                         filtros?.estudiante || undefined,
+
+                    fechaInicio:
+                         filtros?.fechaInicio || undefined,
+                    fechaFin: 
+                        filtros?.fechaFin || undefined,
+
+                    page: pagina,
+                    size: 20
                 })
 
             setAuditorias(response.content)
+
+            setTotalPaginas(response.totalPages)
 
         } catch (error) {
 
@@ -90,20 +108,28 @@ const AuditoriaSesionesPage = () => {
     }
 
     useEffect(() => {
-        fetchAuditorias()
-    }, [])
+    fetchAuditorias(0)
+}, [])
 
     const buscar = () => {
 
     setPaginaActual(1)
 
-    fetchAuditorias({
-        estadoAnterior,
-        estadoNuevo,
-        tutor,
-        estudiante
-    })
-}
+    fetchAuditorias(
+        0,
+        {
+            estadoAnterior,
+            estadoNuevo,
+            tutor,
+            estudiante,
+            fechaInicio,
+            fechaFin
+        }
+    )
+    }
+
+    const auditoriasFiltradas = auditorias
+
 
     const limpiar = () => {
 
@@ -117,51 +143,9 @@ const AuditoriaSesionesPage = () => {
 
     setPaginaActual(1)
 
-    fetchAuditorias()
-    }
-
-    const auditoriasFiltradas = auditorias.filter(item => {
-
-    const fechaRegistro = new Date(item.fechaCambio)
-
-    if (fechaInicio) {
-
-        const inicio = new Date(fechaInicio)
-        inicio.setHours(0, 0, 0, 0)
-
-        if (fechaRegistro < inicio) {
-            return false
-        }
-    }
-
-    if (fechaFin) {
-
-        const fin = new Date(fechaFin)
-        fin.setHours(23, 59, 59, 999)
-
-        if (fechaRegistro > fin) {
-            return false
-        }
-    }
-
-    return true
-})
-
-const totalPaginas = Math.ceil(
-    auditoriasFiltradas.length / registrosPorPagina
-)
-
-const indiceInicial =
-    (paginaActual - 1) * registrosPorPagina
-
-const indiceFinal =
-    indiceInicial + registrosPorPagina
-
-const auditoriasPaginadas =
-    auditoriasFiltradas.slice(
-        indiceInicial,
-        indiceFinal
-    )
+    fetchAuditorias(0)
+}
+    
 
     const exportarPdf = async () => {
 
@@ -243,6 +227,7 @@ const auditoriasPaginadas =
                                 className="w-full rounded-lg border border-input bg-background px-3 py-2"
                             >
                                 <option value="">Sin filtro</option>
+                                <option value="COMPLETADA">Completada</option>
                                 <option value="PENDIENTE">Pendiente</option>
                                 <option value="APROBADA">Aprobada</option>
                                 <option value="CANCELADA">Cancelada</option>
@@ -260,6 +245,7 @@ const auditoriasPaginadas =
                                 className="w-full rounded-lg border border-input bg-background px-3 py-2"
                             >
                                 <option value="">Sin filtro</option>
+                                <option value="COMPLETADA">Completada</option>
                                 <option value="PENDIENTE">Pendiente</option>
                                 <option value="APROBADA">Aprobada</option>
                                 <option value="CANCELADA">Cancelada</option>
@@ -430,7 +416,7 @@ const auditoriasPaginadas =
 
                                     ) : (
 
-                                        auditoriasPaginadas.map(item => (
+                                        auditoriasFiltradas.map(item => (
 
                                             <tr
                                                 key={item.sesionId + item.fechaCambio}
@@ -475,26 +461,7 @@ const auditoriasPaginadas =
 
     <span className="text-sm text-muted-foreground">
 
-        Mostrando
-
-        {' '}
-
-        {auditoriasFiltradas.length === 0
-            ? 0
-            : indiceInicial + 1}
-
-        -
-
-        {Math.min(
-            indiceFinal,
-            auditoriasFiltradas.length
-        )}
-
-        {' '}de{' '}
-
-        {auditoriasFiltradas.length}
-
-        registros
+    Página {paginaActual} de {totalPaginas}
 
     </span>
 
@@ -503,40 +470,50 @@ const auditoriasPaginadas =
         <Button
             variant="outline"
             disabled={paginaActual === 1}
-            onClick={() =>
-                setPaginaActual(
-                    paginaActual - 1
+            onClick={() => {
+
+                const nuevaPagina = paginaActual - 1
+
+                setPaginaActual(nuevaPagina)
+
+                fetchAuditorias(
+                    nuevaPagina - 1,
+                    {
+                        estadoAnterior,
+                        estadoNuevo,
+                        tutor,
+                        estudiante,
+                        fechaInicio,
+                        fechaFin
+                    }
                 )
-            }
+            }}
         >
             Anterior
         </Button>
 
-        <span className="text-sm px-2">
-
-            Página
-
-            {' '}
-
-            {paginaActual}
-
-            {' '}de{' '}
-
-            {totalPaginas || 1}
-
-        </span>
 
         <Button
             variant="outline"
-            disabled={
-                paginaActual === totalPaginas ||
-                totalPaginas === 0
-            }
-            onClick={() =>
-                setPaginaActual(
-                    paginaActual + 1
+            disabled={paginaActual >= totalPaginas}
+            onClick={() => {
+
+                const nuevaPagina = paginaActual + 1
+
+                setPaginaActual(nuevaPagina)
+
+                fetchAuditorias(
+                    nuevaPagina - 1,
+                    {
+                        estadoAnterior,
+                        estadoNuevo,
+                        tutor,
+                        estudiante,
+                        fechaInicio,
+                        fechaFin
+                    }
                 )
-            }
+            }}
         >
             Siguiente
         </Button>
